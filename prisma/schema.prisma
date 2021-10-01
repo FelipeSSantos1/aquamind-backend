@@ -16,6 +16,7 @@ model User {
   profile  Profile?
 
   @@index([email])
+  @@index([active])
 }
 
 enum Role {
@@ -26,7 +27,7 @@ enum Role {
 model Profile {
   id     Int     @id @default(autoincrement())
   name   String?
-  user   User    @relation(fields: [userId], references: [id])
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 
   @@index([userId])

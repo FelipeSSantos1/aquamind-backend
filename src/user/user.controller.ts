@@ -10,18 +10,22 @@ import {
   Post,
   Put,
 } from '@nestjs/common'
-import { User as UserModel } from '@prisma/client'
+import { User as UserModel, Prisma, TokenType } from '@prisma/client'
 import { PrismaService } from '../prisma.service'
-import { Prisma } from '@prisma/client'
+import moment from 'moment'
 
 import { User } from './types'
 import { PasswordService } from 'src/password/password.service'
+import { MailService } from 'src/mail/mail.service'
+import { AuthService } from 'src/auth/auth.service'
 
 @Controller('user')
 export class UserController {
   constructor(
     private readonly prismaService: PrismaService,
     private passwordService: PasswordService,
+    private mailService: MailService,
+    private authService: AuthService,
   ) {}
 
   @Get('users')
@@ -77,14 +81,26 @@ export class UserController {
     const { email, password } = body
     if (email && password) {
       try {
+        const expiration = moment().add(10, 'minutes').toDate()
+        const token = this.authService.generateEmailToken()
+
         const result = await this.prismaService.user.create({
           data: {
             email,
             password: await this.passwordService.hashPassword(password),
+            Token: {
+              create: {
+                expiration,
+                type: TokenType.EMAIL,
+                token,
+              },
+            },
           },
         })
 
-        return { id: result.id }
+        const emailSent = await this.mailService.confirmEmail(token, email)
+
+        return { id: result.id, emailSent }
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {

@@ -13,7 +13,7 @@ model User {
   password String
   active   Boolean  @default(false)
   role     Role     @default(USER)
-  // Relation fields & index
+  // Relation & index --------------
   profile  Profile?
   Token    Token[]
 
@@ -31,24 +31,26 @@ model Token {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   type       TokenType
-  emailToken String?   @unique // Only used for short lived email tokens
+  token      String    @unique
   valid      Boolean   @default(true)
   expiration DateTime
-  // Relation fields & index
+  // Relation & index --------------
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId     String
 
   @@index([userId])
+  @@index([type])
 }
 
 enum TokenType {
-  EMAIL // used as a short-lived token sent to the user's email
+  EMAIL
   API
 }
 
 model Profile {
   id     Int     @id @default(autoincrement())
   name   String?
+  // Relation & index --------------
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 

@@ -1,182 +1,43 @@
-import {
-  BadRequestException,
-  Body,
-  ConflictException,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common'
-import { User as UserModel, Prisma, TokenType } from '@prisma/client'
-import { PrismaService } from '../prisma.service'
-import moment from 'moment'
-
-import { User } from './types'
-import { PasswordService } from 'src/password/password.service'
-import { MailService } from 'src/mail/mail.service'
-import { AuthService } from 'src/auth/auth.service'
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import { AddUserDto, GetByEmailDto, UserIdDto } from './dto/user.dto'
+import { UserService } from './user.service'
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private passwordService: PasswordService,
-    private mailService: MailService,
-    private authService: AuthService,
-  ) {}
+  constructor(private userService: UserService) {}
 
   @Get('users')
-  getAll(): Promise<Omit<UserModel, 'password'>[]> {
-    return this.prismaService.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        active: true,
-        role: true,
-        profile: true,
-      },
-      where: {
-        active: true,
-      },
-    })
+  getAll() {
+    return this.userService.getAll()
   }
 
   @Get(':id')
-  getById(@Param('id') id: string) {
-    return this.prismaService.user.findUnique({
-      select: {
-        id: true,
-        email: true,
-        active: true,
-        role: true,
-        profile: true,
-      },
-      where: {
-        id,
-      },
-    })
+  getById(@Param() { id }: UserIdDto) {
+    return this.userService.getById({ id })
   }
 
   @Get('email/:email')
-  getByEmail(@Param('email') email: string) {
-    return this.prismaService.user.findUnique({
-      select: {
-        id: true,
-        email: true,
-        active: true,
-        role: true,
-        profile: true,
-      },
-      where: {
-        email,
-      },
-    })
+  getByEmail(@Param() { email }: GetByEmailDto) {
+    return this.userService.getByEmail({ email })
   }
 
   @Post()
-  async addUser(@Body() body: User) {
-    const { email, password } = body
-    if (email && password) {
-      try {
-        const expiration = moment().add(10, 'minutes').toDate()
-        const token = this.authService.generateEmailToken()
-
-        const result = await this.prismaService.user.create({
-          data: {
-            email,
-            password: await this.passwordService.hashPassword(password),
-            Token: {
-              create: {
-                expiration,
-                type: TokenType.EMAIL,
-                token,
-              },
-            },
-          },
-        })
-
-        const emailSent = await this.mailService.confirmEmail(token, email)
-
-        return { id: result.id, emailSent }
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === 'P2002') {
-            throw new ConflictException(`Email ${email} already in use`)
-          }
-        }
-        throw new ConflictException()
-      }
-    }
+  async addUser(@Body() body: AddUserDto) {
+    return this.userService.addUser(body)
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string) {
-    if (id) {
-      try {
-        await this.prismaService.user.delete({
-          where: {
-            id,
-          },
-        })
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === 'P2025') {
-            throw new NotFoundException('Record to delete does not exist')
-          }
-        }
-        throw new BadRequestException()
-      }
-    }
+  async deleteUser(@Param() { id }: UserIdDto) {
+    return this.userService.deleteUser({ id })
   }
 
   @Put('deactivate')
-  async deactiveUser(@Body() body: { id: string }) {
-    const { id } = body
-    if (id) {
-      try {
-        await this.prismaService.user.update({
-          where: {
-            id,
-          },
-          data: {
-            active: false,
-          },
-        })
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === 'P2025') {
-            throw new NotFoundException('Record to delete does not exist')
-          }
-        }
-        throw new BadRequestException()
-      }
-    }
+  async deactiveUser(@Body() body: UserIdDto) {
+    return this.userService.deactiveUser(body)
   }
 
   @Put('activate')
-  async activeUser(@Body() body: { id: string }) {
-    const { id } = body
-    if (id) {
-      try {
-        await this.prismaService.user.update({
-          where: {
-            id,
-          },
-          data: {
-            active: true,
-          },
-        })
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === 'P2025') {
-            throw new NotFoundException('Record to delete does not exist')
-          }
-        }
-        throw new BadRequestException()
-      }
-    }
+  async activeUser(@Body() body: UserIdDto) {
+    return this.userService.activeUser(body)
   }
 }

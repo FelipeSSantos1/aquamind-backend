@@ -7,6 +7,7 @@ import { PasswordService } from './password/password.service'
 import { AuthService } from './auth/auth.service'
 import { MailModule } from './mail/mail.module'
 import { AuthModule } from './auth/auth.module'
+import { UserModule } from './user/user.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,8 +15,9 @@ import { AuthModule } from './auth/auth.module'
     }),
     MailModule,
     AuthModule,
+    UserModule,
   ],
-  controllers: [UserController],
-  providers: [PrismaService, PasswordService, AuthService],
+  controllers: [],
+  providers: [PrismaService],
 })
 export class AppModule {}

@@ -8,14 +8,15 @@ generator client {
 }
 
 model User {
-  id       String   @id @default(uuid())
-  email    String   @unique
-  password String
-  active   Boolean  @default(false)
-  role     Role     @default(USER)
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  active    Boolean  @default(false)
+  role      Role     @default(USER)
+  profileId Int?
   // Relation & index --------------
-  profile  Profile?
-  Token    Token[]
+  profile   Profile? @relation(fields: [profileId], references: [id])
+  Token     Token[]
 
   @@index([email])
   @@index([active])
@@ -44,15 +45,12 @@ model Token {
 
 enum TokenType {
   EMAIL
-  API
+  REFRESH_TOKEN
 }
 
 model Profile {
-  id     Int     @id @default(autoincrement())
-  name   String?
+  id   Int     @id @default(autoincrement())
+  name String?
   // Relation & index --------------
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
-
-  @@index([userId])
+  user User?
 }

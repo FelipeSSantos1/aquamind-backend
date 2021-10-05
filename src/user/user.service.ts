@@ -10,7 +10,6 @@ import moment from 'moment'
 import { PrismaError } from 'src/utils/prismaError'
 import { AuthService } from 'src/auth/auth.service'
 import { MailService } from 'src/mail/mail.service'
-import { PasswordService } from 'src/password/password.service'
 import { PrismaService } from 'src/prisma.service'
 import { AddUserDto, GetByEmailDto, UserIdDto } from './dto/user.dto'
 
@@ -18,7 +17,6 @@ import { AddUserDto, GetByEmailDto, UserIdDto } from './dto/user.dto'
 export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
-    private passwordService: PasswordService,
     private mailService: MailService,
     private authService: AuthService,
   ) {}
@@ -77,7 +75,7 @@ export class UserService {
         const result = await this.prismaService.user.create({
           data: {
             email,
-            password: await this.passwordService.hashPassword(password),
+            password: await this.authService.hashPassword(password),
             Token: {
               create: {
                 expiration,

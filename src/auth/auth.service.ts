@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common'
-import { hash, compare } from 'bcrypt'
 
-import { MailService } from '../mail/mail.service'
+import { UserService } from 'src/user/user.service'
+import { MailService } from 'src/mail/mail.service'
 
 @Injectable()
 export class AuthService {
-  constructor(private mailService: MailService) {}
+  constructor(
+    private mailService: MailService,
+    private userService: UserService,
+  ) {}
 
   async forgotPassword(email: string) {
     // const token = Math.floor(1000 + Math.random() * 9000).toString();
@@ -15,15 +18,26 @@ export class AuthService {
     // await this.mailService.forgotPassword(url);
   }
 
-  generateEmailToken(): string {
-    return Math.floor(10000000 + Math.random() * 90000000).toString()
-  }
-
-  validatePassword(password: string, hashedPassword: string): Promise<boolean> {
-    return compare(password, hashedPassword)
-  }
-
-  hashPassword(password: string): Promise<string> {
-    return hash(password, 10)
+  public async getAuthenticatedUser(email: string, hashedPassword: string) {
+    // try {
+    //   const user = await this.usersService.getByEmail(email)
+    //   const isPasswordMatching = await bcrypt.compare(
+    //     hashedPassword,
+    //     user.password,
+    //   )
+    //   if (!isPasswordMatching) {
+    //     throw new HttpException(
+    //       'Wrong credentials provided',
+    //       HttpStatus.BAD_REQUEST,
+    //     )
+    //   }
+    //   user.password = undefined
+    //   return user
+    // } catch (error) {
+    //   throw new HttpException(
+    //     'Wrong credentials provided',
+    //     HttpStatus.BAD_REQUEST,
+    //   )
+    // }
   }
 }

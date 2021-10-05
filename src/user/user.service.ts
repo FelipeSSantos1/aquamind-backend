@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
@@ -8,17 +10,16 @@ import { Prisma, TokenType } from '@prisma/client'
 import moment from 'moment'
 
 import { PrismaError } from 'src/utils/prismaError'
-import { AuthService } from 'src/auth/auth.service'
 import { MailService } from 'src/mail/mail.service'
 import { PrismaService } from 'src/prisma.service'
 import { AddUserDto, GetByEmailDto, UserIdDto } from './dto/user.dto'
+import { createHash, generateEmailToken } from 'src/utils/crypt'
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
     private mailService: MailService,
-    private authService: AuthService,
   ) {}
 
   public getAll() {
@@ -36,46 +37,44 @@ export class UserService {
     })
   }
 
-  public getById({ id }: UserIdDto) {
-    return this.prismaService.user.findUnique({
-      select: {
-        id: true,
-        email: true,
-        active: true,
-        role: true,
-        profile: true,
-      },
+  public async getById({ id }: UserIdDto) {
+    const result = await this.prismaService.user.findUnique({
       where: {
         id,
       },
-    })
-  }
-
-  public getByEmail({ email }: GetByEmailDto) {
-    return this.prismaService.user.findUnique({
-      select: {
-        id: true,
-        email: true,
-        active: true,
-        role: true,
+      include: {
         profile: true,
       },
+    })
+
+    result.password = undefined
+    return result
+  }
+
+  public async getByEmail({ email }: GetByEmailDto) {
+    const result = await this.prismaService.user.findUnique({
       where: {
         email,
       },
+      include: {
+        profile: true,
+      },
     })
+
+    result.password = undefined
+    return result
   }
 
   public async addUser({ email, password }: AddUserDto) {
     if (email && password) {
       try {
         const expiration = moment().add(10, 'minutes').toDate()
-        const token = this.authService.generateEmailToken()
+        const token = generateEmailToken()
 
         const result = await this.prismaService.user.create({
           data: {
             email,
-            password: await this.authService.hashPassword(password),
+            password: await createHash(password),
             Token: {
               create: {
                 expiration,
@@ -88,14 +87,18 @@ export class UserService {
 
         const emailSent = await this.mailService.confirmEmail(token, email)
 
-        return { id: result.id, emailSent }
+        result.password = undefined
+        return { ...result, emailSent }
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === PrismaError.UniqueConstraint) {
             throw new ConflictException(`Email ${email} already in use`)
           }
         }
-        throw new ConflictException()
+        throw new HttpException(
+          'Something went wrong',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        )
       }
     }
   }
@@ -123,21 +126,20 @@ export class UserService {
   public async deactiveUser({ id }: UserIdDto) {
     if (id) {
       try {
-        return await this.prismaService.user.update({
+        const result = await this.prismaService.user.update({
           where: {
             id,
           },
           data: {
             active: false,
           },
-          select: {
-            id: true,
-            email: true,
-            active: true,
-            role: true,
+          include: {
             profile: true,
           },
         })
+
+        result.password = undefined
+        return result
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === PrismaError.RecordDoesNotExist) {
@@ -152,21 +154,20 @@ export class UserService {
   public async activeUser({ id }: UserIdDto) {
     if (id) {
       try {
-        return await this.prismaService.user.update({
+        const result = await this.prismaService.user.update({
           where: {
             id,
           },
           data: {
             active: true,
           },
-          select: {
-            id: true,
-            email: true,
-            active: true,
-            role: true,
+          include: {
             profile: true,
           },
         })
+
+        result.password = undefined
+        return result
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === PrismaError.RecordDoesNotExist) {

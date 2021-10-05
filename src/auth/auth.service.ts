@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 
 import { UserService } from 'src/user/user.service'
 import { MailService } from 'src/mail/mail.service'
+import { validateHash } from 'src/utils/crypt'
 
 @Injectable()
 export class AuthService {
@@ -19,25 +20,18 @@ export class AuthService {
   }
 
   public async getAuthenticatedUser(email: string, hashedPassword: string) {
-    // try {
-    //   const user = await this.usersService.getByEmail(email)
-    //   const isPasswordMatching = await bcrypt.compare(
-    //     hashedPassword,
-    //     user.password,
-    //   )
-    //   if (!isPasswordMatching) {
-    //     throw new HttpException(
-    //       'Wrong credentials provided',
-    //       HttpStatus.BAD_REQUEST,
-    //     )
-    //   }
-    //   user.password = undefined
-    //   return user
-    // } catch (error) {
-    //   throw new HttpException(
-    //     'Wrong credentials provided',
-    //     HttpStatus.BAD_REQUEST,
-    //   )
-    // }
+    try {
+      const user = await this.userService.getByEmail({ email })
+      const isPasswordMatching = await validateHash(
+        hashedPassword,
+        user.password,
+      )
+      if (!isPasswordMatching) return null
+
+      user.password = undefined
+      return user
+    } catch (error) {
+      throw new ForbiddenException('Something went wrong')
+    }
   }
 }

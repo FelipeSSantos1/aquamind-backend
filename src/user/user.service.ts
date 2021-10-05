@@ -1,9 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
-  HttpException,
-  HttpStatus,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common'
 import { Prisma, TokenType } from '@prisma/client'
@@ -61,7 +60,6 @@ export class UserService {
       },
     })
 
-    result.password = undefined
     return result
   }
 
@@ -95,10 +93,7 @@ export class UserService {
             throw new ConflictException(`Email ${email} already in use`)
           }
         }
-        throw new HttpException(
-          'Something went wrong',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        )
+        throw new InternalServerErrorException('Something went wrong')
       }
     }
   }

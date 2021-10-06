@@ -14,18 +14,19 @@ import { JwtStrategy } from './jwt.strategy'
     UserModule,
     PassportModule,
     ConfigModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
-        signOptions: {
-          expiresIn: `${configService.get(
-            'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
-          )}m`,
-        },
-      }),
-    }),
+    // JwtModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     secret: configService.get('JWT_SECRET'),
+    //     signOptions: {
+    //       expiresIn: `${configService.get(
+    //         'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+    //       )}m`,
+    //     },
+    //   }),
+    // }),
+    JwtModule.register({}),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],

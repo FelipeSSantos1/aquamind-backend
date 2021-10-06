@@ -10,7 +10,7 @@ import { UserModule } from './user/user.module'
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        JWT_SECRET: Joi.string().required(),
+        JWT_ACCESS_TOKEN_SECRET: Joi.string().required(),
         JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
         MAIL_FROM: Joi.string().required(),
         MAIL_API_KEY: Joi.string().required(),

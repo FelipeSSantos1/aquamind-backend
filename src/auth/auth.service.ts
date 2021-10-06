@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 
 import { UserService } from 'src/user/user.service'
@@ -9,6 +10,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   public async getAuthenticatedUser(email: string, hashedPassword: string) {
@@ -29,7 +31,12 @@ export class AuthService {
 
   public async createAccessToken(userId: string) {
     const payload: TokenPayload = { userId }
-    const token = this.jwtService.sign(payload)
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+      expiresIn: `${this.configService.get(
+        'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+      )}m`,
+    })
 
     return token
   }

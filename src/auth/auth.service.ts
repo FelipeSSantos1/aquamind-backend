@@ -1,23 +1,15 @@
 import { ForbiddenException, Injectable } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 
 import { UserService } from 'src/user/user.service'
-import { MailService } from 'src/mail/mail.service'
 import { validateHash } from 'src/utils/crypt'
 
 @Injectable()
 export class AuthService {
   constructor(
-    private mailService: MailService,
-    private userService: UserService,
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
   ) {}
-
-  async forgotPassword(email: string) {
-    // const token = Math.floor(1000 + Math.random() * 9000).toString();
-    // create user in db
-    // ...
-    // send mail with url to define a new password
-    // await this.mailService.forgotPassword(url);
-  }
 
   public async getAuthenticatedUser(email: string, hashedPassword: string) {
     try {
@@ -33,5 +25,12 @@ export class AuthService {
     } catch (error) {
       throw new ForbiddenException('Something went wrong')
     }
+  }
+
+  public async createAccessToken(userId: string) {
+    const payload: TokenPayload = { userId }
+    const token = this.jwtService.sign(payload)
+
+    return token
   }
 }

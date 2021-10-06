@@ -11,10 +11,11 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req: ReqWithUser) {
+  async logIn(@Req() req: ReqWithUser) {
     const { user } = req
+    const accessToken = await this.authService.createAccessToken(user.id)
     user.password = undefined
 
-    return user
+    return { ...user, accessToken }
   }
 }

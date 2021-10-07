@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config'
 import { Request } from 'express'
 import moment from 'moment'
 
-import { validateHash } from 'src/utils/crypt'
+import { createHashOneWay } from 'src/utils/crypt'
 import { UserService } from 'src/user/user.service'
 
 @Injectable()
@@ -33,7 +33,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
 
     if (user?.Token?.length) {
       const token = user.Token[0]
-      const isSameToken = await validateHash(refreshToken, token.token) //ToDo: bcrypt returns true to old JWT also
+      const isSameToken = createHashOneWay(refreshToken) === token.token
       const isExpired = moment().isAfter(token.expiration)
 
       if (isSameToken && token.valid && !isExpired) return user

@@ -11,7 +11,7 @@ import moment from 'moment'
 import { PrismaService } from 'src/prisma.service'
 import { UserService } from 'src/user/user.service'
 import { validateHash } from 'src/utils/crypt'
-import { createHash } from 'src/utils/crypt'
+import { createHashOneWay } from 'src/utils/crypt'
 
 @Injectable()
 export class AuthService {
@@ -64,7 +64,7 @@ export class AuthService {
     )
 
     try {
-      const hashedToken = await createHash(token)
+      const hashedToken = createHashOneWay(token)
       const expiration = moment().add(1, 'year').toISOString()
       await this.prismaService.token.upsert({
         create: {

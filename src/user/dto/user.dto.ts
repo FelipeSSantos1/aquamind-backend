@@ -3,7 +3,7 @@ import {
   IsString,
   IsNotEmpty,
   MinLength,
-  IsUUID,
+  IsUUID
 } from 'class-validator'
 
 export class AddUserDto {

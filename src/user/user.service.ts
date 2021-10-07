@@ -3,7 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common'
 import { Prisma, TokenType } from '@prisma/client'
 import moment from 'moment'
@@ -18,7 +18,7 @@ import { createHash, generateEmailToken } from 'src/utils/crypt'
 export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
-    private mailService: MailService,
+    private mailService: MailService
   ) {}
 
   public getAll() {
@@ -28,36 +28,63 @@ export class UserService {
         email: true,
         active: true,
         role: true,
-        profile: true,
+        profile: true
       },
       where: {
-        active: true,
-      },
+        active: true
+      }
     })
   }
 
   public async getById({ id }: UserIdDto) {
-    const result = await this.prismaService.user.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        profile: true,
-      },
-    })
+    try {
+      const result = await this.prismaService.user.findUnique({
+        where: {
+          id
+        },
+        include: {
+          profile: true
+        }
+      })
 
-    result.password = undefined
-    return result
+      result.password = undefined
+      return result
+    } catch (error) {
+      throw new BadRequestException()
+    }
+  }
+
+  public async getByIdWithRefreshToken({ id }: UserIdDto) {
+    try {
+      const result = await this.prismaService.user.findUnique({
+        where: {
+          id
+        },
+        include: {
+          profile: true,
+          Token: {
+            where: {
+              type: TokenType.REFRESHTOKEN
+            }
+          }
+        }
+      })
+
+      result.password = undefined
+      return result
+    } catch (error) {
+      throw new BadRequestException()
+    }
   }
 
   public async getByEmail({ email }: GetByEmailDto) {
     const result = await this.prismaService.user.findUnique({
       where: {
-        email,
+        email
       },
       include: {
-        profile: true,
-      },
+        profile: true
+      }
     })
 
     return result
@@ -77,10 +104,10 @@ export class UserService {
               create: {
                 expiration,
                 type: TokenType.EMAIL,
-                token,
-              },
-            },
-          },
+                token
+              }
+            }
+          }
         })
 
         const emailSent = await this.mailService.confirmEmail(token, email)
@@ -103,8 +130,8 @@ export class UserService {
       try {
         await this.prismaService.user.delete({
           where: {
-            id,
-          },
+            id
+          }
         })
         return true
       } catch (error) {
@@ -123,14 +150,14 @@ export class UserService {
       try {
         const result = await this.prismaService.user.update({
           where: {
-            id,
+            id
           },
           data: {
-            active: false,
+            active: false
           },
           include: {
-            profile: true,
-          },
+            profile: true
+          }
         })
 
         result.password = undefined
@@ -151,14 +178,14 @@ export class UserService {
       try {
         const result = await this.prismaService.user.update({
           where: {
-            id,
+            id
           },
           data: {
-            active: true,
+            active: true
           },
           include: {
-            profile: true,
-          },
+            profile: true
+          }
         })
 
         result.password = undefined

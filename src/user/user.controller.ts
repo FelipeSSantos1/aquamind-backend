@@ -6,9 +6,9 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common'
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
+import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 import { AddUserDto, GetByEmailDto, UserIdDto } from './dto/user.dto'
 import { UserService } from './user.service'
 

@@ -15,7 +15,7 @@ export class MailService {
     subject,
     params,
     template,
-    text = '',
+    text = ''
   }: sendMailProps) {
     const config = new ConfigService()
     const domain = 'aquamind.app'
@@ -23,7 +23,7 @@ export class MailService {
     const mailgun = new Mailgun(formData)
     const mg = mailgun.client({
       username: 'api',
-      key: apiKey,
+      key: apiKey
     })
     const mailgunData = {
       from: `Aquamind <${config.get('MAIL_FROM')}>`,
@@ -31,9 +31,9 @@ export class MailService {
       subject,
       template,
       'h:X-Mailgun-Variables': JSON.stringify({
-        ...params,
+        ...params
       }),
-      text,
+      text
     }
     try {
       await mg.messages.create(domain, mailgunData)
@@ -50,7 +50,7 @@ export class MailService {
       subject: 'Confirm your email',
       template: 'email-confirmation',
       params: { url, email },
-      text: `confirm your email accessing ${url}`,
+      text: `confirm your email accessing ${url}`
     })
   }
 }

@@ -12,15 +12,17 @@ import { UserModule } from './user/user.module'
       validationSchema: Joi.object({
         JWT_ACCESS_TOKEN_SECRET: Joi.string().required(),
         JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
+        JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
+        JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
         MAIL_FROM: Joi.string().required(),
         MAIL_API_KEY: Joi.string().required(),
-        DATABASE_URL: Joi.string().required(),
-      }),
+        DATABASE_URL: Joi.string().required()
+      })
     }),
     MailModule,
     AuthModule,
-    UserModule,
+    UserModule
   ],
-  controllers: [],
+  controllers: []
 })
 export class AppModule {}

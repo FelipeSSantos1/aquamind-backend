@@ -11,7 +11,7 @@ import moment from 'moment'
 import { PrismaService } from 'src/prisma.service'
 import { UserService } from 'src/user/user.service'
 import { validateHash } from 'src/utils/crypt'
-import { createHashOneWay } from 'src/utils/crypt'
+import { createHash } from 'src/utils/crypt'
 
 @Injectable()
 export class AuthService {
@@ -22,13 +22,10 @@ export class AuthService {
     private readonly prismaService: PrismaService
   ) {}
 
-  public async getAuthenticatedUser(email: string, hashedPassword: string) {
+  public async getAuthenticatedUser(email: string, password: string) {
     try {
       const user = await this.userService.getByEmail({ email })
-      const isPasswordMatching = await validateHash(
-        hashedPassword,
-        user.password
-      )
+      const isPasswordMatching = validateHash(password, user.password)
       if (!isPasswordMatching) return null
 
       user.password = undefined
@@ -64,7 +61,7 @@ export class AuthService {
     )
 
     try {
-      const hashedToken = createHashOneWay(token)
+      const hashedToken = createHash(token)
       const expiration = moment().add(1, 'year').toISOString()
       await this.prismaService.token.upsert({
         create: {

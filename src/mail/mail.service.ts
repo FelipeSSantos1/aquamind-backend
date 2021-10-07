@@ -44,7 +44,8 @@ export class MailService {
   }
 
   public async confirmEmail(token: string, email: string) {
-    const url = `http://www.aquamind.app/confirmEmail/${token}`
+    const config = new ConfigService()
+    const url = `${config.get('MAIL_CONFIRMATION_ENDPOINT')}/${token}`
     return await this.sendMail({
       to: email,
       subject: 'Confirm your email',

@@ -16,6 +16,7 @@ import { UserModule } from './user/user.module'
         JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
         MAIL_FROM: Joi.string().required(),
         MAIL_API_KEY: Joi.string().required(),
+        MAIL_CONFIRMATION_ENDPOINT: Joi.string().required(),
         DATABASE_URL: Joi.string().required()
       })
     }),

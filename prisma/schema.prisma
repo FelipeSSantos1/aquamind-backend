@@ -13,10 +13,12 @@ model User {
   password  String
   active    Boolean  @default(false)
   role      Role     @default(USER)
-  profileId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   // Relation & index --------------
-  profile   Profile? @relation(fields: [profileId], references: [id])
-  Token     Token[]
+  profileId Int?     @unique
+  Profile   Profile? @relation(fields: [profileId], references: [id])
+  Tokens    Token[]
 
   @@index([email])
   @@index([active])
@@ -36,7 +38,7 @@ model Token {
   valid      Boolean   @default(true)
   expiration DateTime
   // Relation & index --------------
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  User       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId     String
 
   @@unique([userId, type])
@@ -48,8 +50,187 @@ enum TokenType {
 }
 
 model Profile {
-  id   Int     @id @default(autoincrement())
-  name String?
+  id          Int           @id @default(autoincrement())
+  name        String?
+  username    String?
+  country     String?
+  bio         String?
+  avatar      String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   // Relation & index --------------
-  user User?
+  Following   Follower[]    @relation("Following")
+  Followers   Follower[]    @relation("Follower")
+  User        User?
+  Tanks       Tank[]
+  LikePost    LikePost[]
+  Comment     Comment[]
+  LikeComment LikeComment[]
+}
+
+model Brand {
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  website    FertUnit
+  logo       String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  // Relation & index --------------
+  Fertilizer Fertilizer[]
+  Plant      Plant[]
+}
+
+model Follower {
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Relation & index --------------
+  idFollowing Int
+  idFollower  Int
+  Following   Profile  @relation(fields: [idFollowing], references: [id], name: "Following")
+  Follower    Profile  @relation(fields: [idFollower], references: [id], name: "Follower")
+
+  @@id([idFollowing, idFollower])
+}
+
+model Fertilizer {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  unit           FertUnit
+  avatar         String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  // Relation & index --------------
+  Brand          Brand?           @relation(fields: [brandId], references: [id])
+  brandId        Int?
+  TankFertilizer TankFertilizer[]
+}
+
+enum FertUnit {
+  ml
+  mg
+}
+
+model Plant {
+  id             Int          @id @default(autoincrement())
+  name           String       @unique
+  scientificName String?      @unique
+  avatar         String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  // Relation & index --------------
+  Brand          Brand?       @relation(fields: [brandId], references: [id])
+  brandId        Int?
+  Photos         PlantPhoto[]
+  TankPlant      TankPlant[]
+}
+
+model PlantPhoto {
+  id        Int      @id @default(autoincrement())
+  photo     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Relation & index --------------
+  Plant     Plant?   @relation(fields: [plantId], references: [id])
+  plantId   Int?
+}
+
+model Tank {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  born           DateTime?
+  length         Float
+  width          Float
+  height         Float
+  light          String?
+  gravel         String?
+  co2            Int?
+  dayLight       Float?
+  filter         String?
+  description    String?
+  avatar         String?
+  public         Boolean          @default(true)
+  location       String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  // Relation & index --------------
+  Profile        Profile?         @relation(fields: [profileId], references: [id])
+  profileId      Int?
+  TankFertilizer TankFertilizer[]
+  TankPlant      TankPlant[]
+}
+
+model TankFertilizer {
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  // Relation & index --------------
+  Tank         Tank       @relation(fields: [tankId], references: [id])
+  tankId       Int
+  Fertilizer   Fertilizer @relation(fields: [fertilizerId], references: [id])
+  fertilizerId Int
+
+  @@id([tankId, fertilizerId])
+}
+
+model TankPlant {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Relation & index --------------
+  Tank      Tank     @relation(fields: [tankId], references: [id])
+  tankId    Int
+  Plant     Plant    @relation(fields: [plantId], references: [id])
+  plantId   Int
+
+  @@id([tankId, plantId])
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  photo       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Relation & index --------------
+
+  LikePost LikePost[]
+  Comment  Comment[]
+}
+
+model LikePost {
+  Post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+  Profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Relation & index --------------
+
+  @@id([postId, profileId])
+}
+
+model Comment {
+  id          Int           @id @default(autoincrement())
+  comment     String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  // Relation & index --------------
+  Parent      Comment?      @relation("CommentToComment", fields: [commentId], references: [id])
+  commentId   Int?
+  Comment     Comment[]     @relation("CommentToComment")
+  Post        Post          @relation(fields: [postId], references: [id])
+  postId      Int
+  Profile     Profile       @relation(fields: [profileId], references: [id])
+  profileId   Int
+  LikeComment LikeComment[]
+}
+
+model LikeComment {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Relation & index --------------
+  Profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId Int
+  Comment   Comment  @relation(fields: [commentId], references: [id])
+  commentId Int
+
+  @@id([profileId, commentId])
 }

@@ -31,8 +31,8 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
     })
     const refreshToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request)
 
-    if (user?.Token?.length) {
-      const token = user.Token[0]
+    if (user?.Tokens?.length) {
+      const token = user.Tokens[0]
       const isSameToken = createHash(refreshToken) === token.token
       const isExpired = moment().isAfter(token.expiration)
 

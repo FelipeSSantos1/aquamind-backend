@@ -32,7 +32,7 @@ export class UserService {
         email: true,
         active: true,
         role: true,
-        profile: true
+        Profile: true
       },
       where: {
         active: true
@@ -47,7 +47,7 @@ export class UserService {
           id
         },
         include: {
-          profile: true
+          Profile: true
         }
       })
 
@@ -65,8 +65,8 @@ export class UserService {
           id
         },
         include: {
-          profile: true,
-          Token: {
+          Profile: true,
+          Tokens: {
             where: {
               type: TokenType.REFRESHTOKEN
             }
@@ -87,7 +87,7 @@ export class UserService {
         email
       },
       include: {
-        profile: true
+        Profile: true
       }
     })
 
@@ -169,7 +169,7 @@ export class UserService {
             active: false
           },
           include: {
-            profile: true
+            Profile: true
           }
         })
 
@@ -197,7 +197,7 @@ export class UserService {
             active: true
           },
           include: {
-            profile: true
+            Profile: true
           }
         })
 

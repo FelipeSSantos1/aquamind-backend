@@ -5,6 +5,7 @@ import Joi from '@hapi/joi'
 import { MailModule } from './mail/mail.module'
 import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
+import { PlantModule } from './plant/plant.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,7 +23,8 @@ import { UserModule } from './user/user.module'
     }),
     MailModule,
     AuthModule,
-    UserModule
+    UserModule,
+    PlantModule
   ],
   controllers: []
 })

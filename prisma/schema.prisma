@@ -4,7 +4,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 model User {
@@ -71,7 +72,7 @@ model Profile {
 model Brand {
   id         Int          @id @default(autoincrement())
   name       String       @unique
-  website    FertUnit
+  website    String
   logo       String?
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
@@ -95,6 +96,7 @@ model Follower {
 model Fertilizer {
   id             Int              @id @default(autoincrement())
   name           String           @unique
+  description    String?
   unit           FertUnit
   avatar         String?
   createdAt      DateTime         @default(now())
@@ -113,6 +115,7 @@ enum FertUnit {
 model Plant {
   id             Int          @id @default(autoincrement())
   name           String       @unique
+  description    String?
   scientificName String?      @unique
   avatar         String?
   createdAt      DateTime     @default(now())

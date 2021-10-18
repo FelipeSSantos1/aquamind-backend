@@ -25,7 +25,7 @@ export class UserService {
     private readonly configService: ConfigService
   ) {}
 
-  public getAll() {
+  getAll() {
     return this.prismaService.user.findMany({
       select: {
         id: true,
@@ -40,7 +40,7 @@ export class UserService {
     })
   }
 
-  public async getById({ id }: UserIdDto) {
+  async getById({ id }: UserIdDto) {
     try {
       const result = await this.prismaService.user.findUnique({
         where: {
@@ -58,7 +58,7 @@ export class UserService {
     }
   }
 
-  public async getByIdWithRefreshToken({ id }: UserIdDto) {
+  async getByIdWithRefreshToken({ id }: UserIdDto) {
     try {
       const result = await this.prismaService.user.findUnique({
         where: {
@@ -81,7 +81,7 @@ export class UserService {
     }
   }
 
-  public async getByEmail({ email }: GetByEmailDto) {
+  async getByEmail({ email }: GetByEmailDto) {
     const result = await this.prismaService.user.findUnique({
       where: {
         email
@@ -94,7 +94,7 @@ export class UserService {
     return result
   }
 
-  public async addUser({ email, password }: AddUserDto) {
+  async addUser({ email, password }: AddUserDto) {
     if (email && password) {
       try {
         const result = await this.prismaService.user.create({
@@ -138,7 +138,7 @@ export class UserService {
     }
   }
 
-  public async deleteUser({ id }: UserIdDto) {
+  async deleteUser({ id }: UserIdDto) {
     if (id) {
       try {
         await this.prismaService.user.delete({
@@ -158,7 +158,7 @@ export class UserService {
     }
   }
 
-  public async deactiveUser({ id }: UserIdDto) {
+  async deactiveUser({ id }: UserIdDto) {
     if (id) {
       try {
         const result = await this.prismaService.user.update({
@@ -186,7 +186,7 @@ export class UserService {
     }
   }
 
-  public async activeUser({ id }: UserIdDto) {
+  async activeUser({ id }: UserIdDto) {
     if (id) {
       try {
         const result = await this.prismaService.user.update({

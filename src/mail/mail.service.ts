@@ -43,7 +43,7 @@ export class MailService {
     }
   }
 
-  public async confirmEmail(token: string, email: string) {
+  async confirmEmail(token: string, email: string) {
     const config = new ConfigService()
     const url = `${config.get('MAIL_CONFIRMATION_ENDPOINT')}/${token}`
     return await this.sendMail({

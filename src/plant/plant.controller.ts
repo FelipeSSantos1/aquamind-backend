@@ -7,7 +7,7 @@ import { PlantService } from './plant.service'
 export class PlantController {
   constructor(private plantService: PlantService) {}
 
-  @Get('plants')
+  @Get()
   @UseGuards(JwtAuthGuard)
   getAll() {
     return this.plantService.getAll()

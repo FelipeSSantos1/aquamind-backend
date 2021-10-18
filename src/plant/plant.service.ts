@@ -7,7 +7,7 @@ import { GetByNameDto, PlantIdDto } from './dto/plant.dto'
 export class PlantService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  public getAll() {
+  getAll() {
     return this.prismaService.plant.findMany({
       include: {
         Brand: true,
@@ -24,7 +24,7 @@ export class PlantService {
     })
   }
 
-  public async getById({ id }: PlantIdDto) {
+  async getById({ id }: PlantIdDto) {
     try {
       const result = await this.prismaService.plant.findUnique({
         where: {
@@ -42,7 +42,7 @@ export class PlantService {
     }
   }
 
-  public async getByName({ name }: GetByNameDto) {
+  async getByName({ name }: GetByNameDto) {
     const result = await this.prismaService.plant.findMany({
       where: {
         OR: [

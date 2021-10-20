@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
 import { PlantModule } from './plant/plant.module'
 import { FertilizerModule } from './fertilizer/fertilizer.module'
+import { PostModule } from './post/post.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,7 +27,8 @@ import { FertilizerModule } from './fertilizer/fertilizer.module'
     AuthModule,
     UserModule,
     PlantModule,
-    FertilizerModule
+    FertilizerModule,
+    PostModule
   ],
   controllers: []
 })

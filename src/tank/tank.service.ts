@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException
@@ -14,7 +15,6 @@ export class TankService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(tank: CreateTankDto, user: User) {
-    // upload image and get URI
     try {
       const result = await this.prismaService.tank.create({
         data: {
@@ -31,13 +31,16 @@ export class TankService {
           light: tank.light,
           public: tank.public,
           location: tank.location,
-          avatar: 'urlFromAWS',
+          avatar: tank.avatar,
           profileId: user.profileId
         }
       })
 
       return result
     } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaError.ForeignKeyConstraint) {
           throw new NotFoundException('Create a profile before add a tank')

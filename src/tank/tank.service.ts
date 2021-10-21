@@ -40,7 +40,29 @@ export class TankService {
           public: tank.public,
           location: tank.location,
           avatar: uploadedFile.Key,
-          profileId: user.profileId
+          profileId: user.profileId,
+          TankPlant: {
+            createMany: {
+              data: tank.plants ? [...tank.plants] : []
+            }
+          },
+          TankFertilizer: {
+            createMany: {
+              data: tank.ferts ? [...tank.ferts] : []
+            }
+          }
+        },
+        include: {
+          TankFertilizer: {
+            include: {
+              Fertilizer: true
+            }
+          },
+          TankPlant: {
+            include: {
+              Plant: true
+            }
+          }
         }
       })
 
@@ -51,7 +73,7 @@ export class TankService {
       }
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaError.ForeignKeyConstraint) {
-          throw new NotFoundException('Create a profile before add a tank')
+          throw new NotFoundException('ForeignKeyConstraint')
         }
       }
       throw new InternalServerErrorException('Something went wrong')
@@ -67,7 +89,6 @@ export class TankService {
   }
 
   update(id: number, updateTankDto: UpdateTankDto) {
-    console.log(updateTankDto)
     return `This action updates a #${id} tank`
   }
 

@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer'
 import {
   IsString,
   IsNumberString,
@@ -6,7 +7,10 @@ import {
   IsOptional,
   IsNotEmpty,
   Min,
-  IsNumber
+  IsNumber,
+  IsBase64,
+  ValidateNested,
+  IsArray
 } from 'class-validator'
 
 export class GetTankByIdDto {
@@ -61,7 +65,7 @@ export class CreateTankDto {
   description?: string
 
   @IsOptional()
-  @IsString()
+  @IsBase64()
   avatar?: string
 
   @IsBoolean()
@@ -71,6 +75,31 @@ export class CreateTankDto {
   @IsOptional()
   @IsString()
   location?: string
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @IsArray()
+  @Type(() => Plant)
+  plants?: {
+    plantId: number
+  }[]
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @IsArray()
+  @Type(() => Fertilizer)
+  ferts?: {
+    fertilizerId: number
+  }[]
+}
+
+class Fertilizer {
+  @IsNumber()
+  fertilizerId: number
+}
+class Plant {
+  @IsNumber()
+  plantId: number
 }
 
 export class UpdateTankDto {

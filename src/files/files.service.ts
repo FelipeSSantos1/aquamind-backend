@@ -12,10 +12,7 @@ export class FilesService {
   async uploadTankAvatar(img: string, profileId: number) {
     try {
       const s3 = new S3({ ...SpaceConfig() })
-      const dataBuffer = Buffer.from(
-        img.replace(/^data:image\/\w+;base64,/, ''),
-        'base64'
-      )
+      const dataBuffer = Buffer.from(img, 'base64')
 
       const uploadResult = await s3
         .upload({

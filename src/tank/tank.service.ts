@@ -80,8 +80,57 @@ export class TankService {
     }
   }
 
-  findAll() {
-    return `This action returns all tank`
+  async findAllByUser(user: User) {
+    try {
+      const result = this.prismaService.tank.findMany({
+        where: {
+          profileId: user.profileId
+        },
+        include: {
+          TankFertilizer: {
+            select: {
+              amount: true,
+              Fertilizer: {
+                select: {
+                  id: true,
+                  avatar: true,
+                  name: true,
+                  unit: true
+                }
+              }
+            },
+            orderBy: {
+              Fertilizer: {
+                name: 'asc'
+              }
+            }
+          },
+          TankPlant: {
+            select: {
+              Plant: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatar: true
+                }
+              }
+            },
+            orderBy: {
+              Plant: {
+                name: 'asc'
+              }
+            }
+          }
+        },
+        orderBy: {
+          born: 'desc'
+        }
+      })
+
+      return result
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 
   findOne(id: number) {

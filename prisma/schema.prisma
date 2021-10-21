@@ -39,7 +39,7 @@ model Token {
   valid      Boolean   @default(true)
   expiration DateTime
   // Relation & index --------------
-  User       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  User       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
 
   @@unique([userId, type])
@@ -87,8 +87,8 @@ model Follower {
   // Relation & index --------------
   idFollowing Int
   idFollower  Int
-  Following   Profile  @relation(fields: [idFollowing], references: [id], name: "Following")
-  Follower    Profile  @relation(fields: [idFollower], references: [id], name: "Follower")
+  Following   Profile  @relation(fields: [idFollowing], references: [id], name: "Following", onDelete: Cascade)
+  Follower    Profile  @relation(fields: [idFollower], references: [id], name: "Follower", onDelete: Cascade)
 
   @@id([idFollowing, idFollower])
 }
@@ -97,7 +97,7 @@ model Fertilizer {
   id             Int              @id @default(autoincrement())
   name           String           @unique
   description    String?
-  unit           FertUnit
+  unit           String
   avatar         String?
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
@@ -105,11 +105,6 @@ model Fertilizer {
   Brand          Brand?           @relation(fields: [brandId], references: [id])
   brandId        Int?
   TankFertilizer TankFertilizer[]
-}
-
-enum FertUnit {
-  ml
-  mg
 }
 
 model Plant {
@@ -133,7 +128,7 @@ model PlantPhoto {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   // Relation & index --------------
-  Plant     Plant?   @relation(fields: [plantId], references: [id])
+  Plant     Plant?   @relation(fields: [plantId], references: [id], onDelete: Cascade)
   plantId   Int?
 }
 
@@ -156,7 +151,7 @@ model Tank {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   // Relation & index --------------
-  Profile        Profile?         @relation(fields: [profileId], references: [id])
+  Profile        Profile?         @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId      Int?
   TankFertilizer TankFertilizer[]
   TankPlant      TankPlant[]
@@ -165,10 +160,11 @@ model Tank {
 model TankFertilizer {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  amount       Int        @default(0)
   // Relation & index --------------
-  Tank         Tank       @relation(fields: [tankId], references: [id])
+  Tank         Tank       @relation(fields: [tankId], references: [id], onDelete: Cascade)
   tankId       Int
-  Fertilizer   Fertilizer @relation(fields: [fertilizerId], references: [id])
+  Fertilizer   Fertilizer @relation(fields: [fertilizerId], references: [id], onDelete: Cascade)
   fertilizerId Int
 
   @@id([tankId, fertilizerId])
@@ -178,9 +174,9 @@ model TankPlant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   // Relation & index --------------
-  Tank      Tank     @relation(fields: [tankId], references: [id])
+  Tank      Tank     @relation(fields: [tankId], references: [id], onDelete: Cascade)
   tankId    Int
-  Plant     Plant    @relation(fields: [plantId], references: [id])
+  Plant     Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
   plantId   Int
 
   @@id([tankId, plantId])
@@ -199,9 +195,9 @@ model Post {
 }
 
 model LikePost {
-  Post      Post     @relation(fields: [postId], references: [id])
+  Post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int
-  Profile   Profile  @relation(fields: [profileId], references: [id])
+  Profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -219,9 +215,9 @@ model Comment {
   Parent      Comment?      @relation("CommentToComment", fields: [commentId], references: [id])
   commentId   Int?
   Comment     Comment[]     @relation("CommentToComment")
-  Post        Post          @relation(fields: [postId], references: [id])
+  Post        Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId      Int
-  Profile     Profile       @relation(fields: [profileId], references: [id])
+  Profile     Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId   Int
   LikeComment LikeComment[]
 }
@@ -230,9 +226,9 @@ model LikeComment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   // Relation & index --------------
-  Profile   Profile  @relation(fields: [profileId], references: [id])
+  Profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId Int
-  Comment   Comment  @relation(fields: [commentId], references: [id])
+  Comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId Int
 
   @@id([profileId, commentId])

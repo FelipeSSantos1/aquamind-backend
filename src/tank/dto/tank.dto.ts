@@ -96,6 +96,9 @@ export class CreateTankDto {
 class Fertilizer {
   @IsNumber()
   fertilizerId: number
+
+  @IsNumber()
+  amount: number
 }
 class Plant {
   @IsNumber()

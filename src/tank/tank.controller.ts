@@ -5,15 +5,16 @@ import {
   Body,
   Param,
   Delete,
-  Put,
   UseGuards,
-  Req
+  Req,
+  Patch
 } from '@nestjs/common'
 
 import ReqWithUser from 'src/auth/reqWithUser.interface'
 import { TankService } from './tank.service'
 import { CreateTankDto, UpdateTankDto } from './dto/tank.dto'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
+import { FindOneParam } from 'src/utils/findOneParam'
 
 @Controller('tank')
 export class TankController {
@@ -25,10 +26,10 @@ export class TankController {
     return this.tankService.create(tank, req.user)
   }
 
-  @Get()
+  @Get('byUser')
   @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.tankService.findAll()
+  findAllByUser(@Req() req: ReqWithUser) {
+    return this.tankService.findAllByUser(req.user)
   }
 
   @Get(':id')
@@ -37,10 +38,10 @@ export class TankController {
     return this.tankService.findOne(+id)
   }
 
-  @Put(':id')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string, @Body() updateTankDto: UpdateTankDto) {
-    return this.tankService.update(+id, updateTankDto)
+  update(@Param() { id }: FindOneParam, @Body() updateTankDto: UpdateTankDto) {
+    return this.tankService.update(Number(id), updateTankDto)
   }
 
   @Delete(':id')

@@ -8,13 +8,21 @@ import { Prisma, User } from '@prisma/client'
 
 import { PrismaService } from 'src/prisma.service'
 import { PrismaError } from 'src/utils/prismaError'
+import { FilesService } from 'src/files/files.service'
 import { UpdateTankDto, CreateTankDto } from './dto/tank.dto'
 
 @Injectable()
 export class TankService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly filesService: FilesService,
+    private readonly prismaService: PrismaService
+  ) {}
 
   async create(tank: CreateTankDto, user: User) {
+    const uploadedFile = await this.filesService.uploadTankAvatar(
+      tank.avatar,
+      user.profileId
+    )
     try {
       const result = await this.prismaService.tank.create({
         data: {
@@ -31,7 +39,7 @@ export class TankService {
           light: tank.light,
           public: tank.public,
           location: tank.location,
-          avatar: tank.avatar,
+          avatar: uploadedFile.Key,
           profileId: user.profileId
         }
       })

@@ -10,7 +10,8 @@ export class FertilizerService {
   getAll() {
     return this.prismaService.fertilizer.findMany({
       include: {
-        Brand: true
+        Brand: true,
+        Photos: true
       },
       orderBy: [
         {
@@ -27,7 +28,8 @@ export class FertilizerService {
           id: Number(id)
         },
         include: {
-          Brand: true
+          Brand: true,
+          Photos: true
         }
       })
 
@@ -46,7 +48,8 @@ export class FertilizerService {
         }
       },
       include: {
-        Brand: true
+        Brand: true,
+        Photos: true
       },
       orderBy: [
         {

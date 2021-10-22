@@ -12,7 +12,7 @@ import {
 
 import ReqWithUser from 'src/auth/reqWithUser.interface'
 import { TankService } from './tank.service'
-import { CreateTankDto, UpdateTankDto } from './dto/tank.dto'
+import { CreateTankDto, UpdateTankDto, UpdatePhotoDto } from './dto/tank.dto'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 import { FindOneParam } from 'src/utils/findOneParam'
 
@@ -42,6 +42,16 @@ export class TankController {
   @UseGuards(JwtAuthGuard)
   update(@Param() { id }: FindOneParam, @Body() updateTankDto: UpdateTankDto) {
     return this.tankService.update(Number(id), updateTankDto)
+  }
+
+  @Patch('updatePhoto/:id')
+  @UseGuards(JwtAuthGuard)
+  updatePhoto(
+    @Param() { id }: FindOneParam,
+    @Body() photo: UpdatePhotoDto,
+    @Req() req: ReqWithUser
+  ) {
+    return this.tankService.updatePhoto(Number(id), photo, req.user)
   }
 
   @Delete(':id')

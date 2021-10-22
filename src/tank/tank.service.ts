@@ -9,7 +9,7 @@ import { Prisma, User } from '@prisma/client'
 import { PrismaService } from 'src/prisma.service'
 import { PrismaError } from 'src/utils/prismaError'
 import { FilesService } from 'src/files/files.service'
-import { UpdateTankDto, CreateTankDto } from './dto/tank.dto'
+import { UpdateTankDto, CreateTankDto, UpdatePhotoDto } from './dto/tank.dto'
 
 @Injectable()
 export class TankService {
@@ -194,6 +194,73 @@ export class TankService {
 
   update(id: number, updateTankDto: UpdateTankDto) {
     return `This action updates a #${id} tank`
+  }
+
+  async updatePhoto(id: number, photo: UpdatePhotoDto, user: User) {
+    const uploadedFile = await this.filesService.uploadTankAvatar(
+      photo.avatar,
+      user.profileId
+    )
+
+    try {
+      const result = await this.prismaService.tank.update({
+        where: {
+          id
+        },
+        data: {
+          avatar: uploadedFile.Key
+        },
+        include: {
+          TankFertilizer: {
+            select: {
+              amount: true,
+              Fertilizer: {
+                select: {
+                  id: true,
+                  avatar: true,
+                  name: true,
+                  unit: true
+                }
+              }
+            },
+            orderBy: {
+              Fertilizer: {
+                name: 'asc'
+              }
+            }
+          },
+          TankPlant: {
+            select: {
+              Plant: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatar: true
+                }
+              }
+            },
+            orderBy: {
+              Plant: {
+                name: 'asc'
+              }
+            }
+          }
+        }
+      })
+
+      if (!result) throw new NotFoundException()
+      return result
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Tank not found')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 
   async remove(id: number) {

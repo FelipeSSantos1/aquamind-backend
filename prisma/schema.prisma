@@ -105,31 +105,22 @@ model Fertilizer {
   Brand          Brand?           @relation(fields: [brandId], references: [id])
   brandId        Int?
   TankFertilizer TankFertilizer[]
+  Photos         File[]
 }
 
 model Plant {
-  id             Int          @id @default(autoincrement())
-  name           String       @unique
+  id             Int         @id @default(autoincrement())
+  name           String      @unique
   description    String?
-  scientificName String?      @unique
+  scientificName String?     @unique
   avatar         String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
   // Relation & index --------------
-  Brand          Brand?       @relation(fields: [brandId], references: [id])
+  Brand          Brand?      @relation(fields: [brandId], references: [id])
   brandId        Int?
-  Photos         PlantPhoto[]
+  Photos         File[]
   TankPlant      TankPlant[]
-}
-
-model PlantPhoto {
-  id        Int      @id @default(autoincrement())
-  photo     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  // Relation & index --------------
-  Plant     Plant?   @relation(fields: [plantId], references: [id], onDelete: Cascade)
-  plantId   Int?
 }
 
 model Tank {
@@ -192,6 +183,7 @@ model Post {
 
   LikePost LikePost[]
   Comment  Comment[]
+  Photos   File[]
 }
 
 model LikePost {
@@ -232,4 +224,24 @@ model LikeComment {
   commentId Int
 
   @@id([profileId, commentId])
+}
+
+model File {
+  id           Int         @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  type         FileType    @default(PHOTO)
+  title        String?
+  url          String
+  // Relation & index --------------
+  Post         Post?       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId       Int?
+  Plant        Plant?      @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  plantId      Int?
+  Fertilizer   Fertilizer? @relation(fields: [fertilizerId], references: [id], onDelete: Cascade)
+  fertilizerId Int?
+}
+
+enum FileType {
+  PHOTO
 }

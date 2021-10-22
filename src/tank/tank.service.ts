@@ -133,15 +133,87 @@ export class TankService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tank`
+  async findOne(id: number) {
+    try {
+      const result = await this.prismaService.tank.findFirst({
+        where: {
+          id
+        },
+        include: {
+          TankFertilizer: {
+            select: {
+              amount: true,
+              Fertilizer: {
+                select: {
+                  id: true,
+                  avatar: true,
+                  name: true,
+                  unit: true
+                }
+              }
+            },
+            orderBy: {
+              Fertilizer: {
+                name: 'asc'
+              }
+            }
+          },
+          TankPlant: {
+            select: {
+              Plant: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatar: true
+                }
+              }
+            },
+            orderBy: {
+              Plant: {
+                name: 'asc'
+              }
+            }
+          }
+        }
+      })
+      if (!result) {
+        throw new NotFoundException()
+      }
+
+      return result
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Tank not found')
+      }
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 
   update(id: number, updateTankDto: UpdateTankDto) {
     return `This action updates a #${id} tank`
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tank`
+  async remove(id: number) {
+    try {
+      return await this.prismaService.tank.delete({
+        where: {
+          id
+        }
+      })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Tank not found')
+        }
+        throw new InternalServerErrorException('Something went wrong')
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 }

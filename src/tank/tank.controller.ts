@@ -34,8 +34,8 @@ export class TankController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: string) {
-    return this.tankService.findOne(+id)
+  findOne(@Param() { id }: FindOneParam) {
+    return this.tankService.findOne(Number(id))
   }
 
   @Patch(':id')
@@ -46,7 +46,7 @@ export class TankController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string) {
-    return this.tankService.remove(+id)
+  remove(@Param() { id }: FindOneParam) {
+    return this.tankService.remove(Number(id))
   }
 }

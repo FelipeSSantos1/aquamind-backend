@@ -67,6 +67,7 @@ model Profile {
   LikePost    LikePost[]
   Comment     Comment[]
   LikeComment LikeComment[]
+  Posts       Post[]
 }
 
 model Brand {
@@ -146,6 +147,7 @@ model Tank {
   profileId      Int?
   TankFertilizer TankFertilizer[]
   TankPlant      TankPlant[]
+  Posts          Post[]
 }
 
 model TankFertilizer {
@@ -174,16 +176,18 @@ model TankPlant {
 }
 
 model Post {
-  id          Int      @id @default(autoincrement())
-  photo       String
+  id          Int        @id @default(autoincrement())
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   // Relation & index --------------
-
-  LikePost LikePost[]
-  Comment  Comment[]
-  Photos   File[]
+  LikePost    LikePost[]
+  Comment     Comment[]
+  Photos      File[]
+  Tank        Tank?      @relation(fields: [tankId], references: [id], onDelete: Cascade)
+  tankId      Int?
+  Profile     Profile?   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId   Int?
 }
 
 model LikePost {

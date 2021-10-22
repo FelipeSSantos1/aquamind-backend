@@ -1,8 +1,9 @@
 import {
   IsString,
-  IsNotEmpty,
   IsNumberString,
-  MinLength
+  IsArray,
+  IsOptional,
+  IsBase64
 } from 'class-validator'
 
 export class GetPostByIdDto {
@@ -10,10 +11,12 @@ export class GetPostByIdDto {
   id: string
 }
 export class CreatePostDto {
-  @IsNumberString()
-  id: string
+  @IsArray()
+  @IsBase64({ each: true })
+  photos: string[]
+
+  @IsString()
+  @IsOptional()
+  description?: string
 }
-export class UpdatePostDto {
-  @IsNumberString()
-  id: string
-}
+export class UpdatePostDto {}

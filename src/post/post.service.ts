@@ -1,14 +1,97 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException
+} from '@nestjs/common'
+import { Prisma, User } from '@prisma/client'
+import _ from 'lodash'
+
+import { FilesService } from 'src/files/files.service'
+import { PrismaService } from 'src/prisma.service'
+import { PrismaError } from 'src/utils/prismaError'
 import { GetPostByIdDto, CreatePostDto, UpdatePostDto } from './dto/post.dto'
 
 @Injectable()
 export class PostService {
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post'
+  constructor(
+    private readonly filesService: FilesService,
+    private readonly prismaService: PrismaService
+  ) {}
+
+  async create(post: CreatePostDto, user: User) {
+    const fileNames = await this.filesService.uploadPostPhotos(
+      post.photos,
+      user.profileId
+    )
+
+    const imagePaths = _.map(fileNames, (url) => {
+      return { url }
+    })
+
+    try {
+      const result = await this.prismaService.post.create({
+        data: {
+          profileId: user.profileId,
+          description: post.description,
+          Photos: {
+            createMany: {
+              data: imagePaths
+            }
+          }
+        },
+        include: {
+          Photos: true
+        }
+      })
+
+      return result
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.ForeignKeyConstraint) {
+          throw new NotFoundException('ForeignKeyConstraint')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 
   findAll() {
-    return `This action returns all post`
+    try {
+      return this.prismaService.post.findMany({
+        include: {
+          Photos: {
+            select: {
+              id: true,
+              url: true
+            }
+          },
+          Profile: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              avatar: true,
+              country: true
+            }
+          },
+          _count: {
+            select: {
+              Comment: true,
+              LikePost: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      })
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 
   findOne(id: GetPostByIdDto) {

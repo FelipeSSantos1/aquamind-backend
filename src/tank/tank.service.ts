@@ -192,8 +192,89 @@ export class TankService {
     }
   }
 
-  update(id: number, updateTankDto: UpdateTankDto) {
-    return `This action updates a #${id} tank`
+  async update(id: number, tank: UpdateTankDto) {
+    const { plants, ferts, ...restTank } = tank
+    try {
+      await this.prismaService.tankFertilizer.deleteMany({
+        where: {
+          tankId: id
+        }
+      })
+
+      await this.prismaService.tankPlant.deleteMany({
+        where: {
+          tankId: id
+        }
+      })
+
+      const result = await this.prismaService.tank.update({
+        where: {
+          id
+        },
+        data: {
+          ...restTank,
+          TankPlant: {
+            createMany: {
+              data: plants ? [...plants] : []
+            }
+          },
+          TankFertilizer: {
+            createMany: {
+              data: ferts ? [...ferts] : []
+            }
+          }
+        },
+        include: {
+          TankFertilizer: {
+            select: {
+              amount: true,
+              Fertilizer: {
+                select: {
+                  id: true,
+                  avatar: true,
+                  name: true,
+                  unit: true
+                }
+              }
+            },
+            orderBy: {
+              Fertilizer: {
+                name: 'asc'
+              }
+            }
+          },
+          TankPlant: {
+            select: {
+              Plant: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatar: true
+                }
+              }
+            },
+            orderBy: {
+              Plant: {
+                name: 'asc'
+              }
+            }
+          }
+        }
+      })
+
+      if (!result) throw new NotFoundException()
+      return result
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Tank not found')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 
   async updatePhoto(id: number, photo: UpdatePhotoDto, user: User) {

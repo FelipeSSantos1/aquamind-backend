@@ -19,6 +19,7 @@ import {
 } from './dto/post.dto'
 import ReqWithUser from 'src/auth/reqWithUser.interface'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
+import { FindOneParam } from 'src/utils/findOneParam'
 
 @Controller('post')
 export class PostController {
@@ -38,8 +39,8 @@ export class PostController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: GetPostByIdDto) {
-    return this.postService.findOne(id)
+  findOne(@Param() { id }: FindOneParam) {
+    return this.postService.findOne(Number(id))
   }
 
   @Put(':id')

@@ -3,7 +3,8 @@ import {
   IsNumberString,
   IsArray,
   IsOptional,
-  IsBase64
+  IsBase64,
+  IsNumber
 } from 'class-validator'
 
 export class GetPostByIdDto {
@@ -18,6 +19,10 @@ export class CreatePostDto {
   @IsString()
   @IsOptional()
   description?: string
+
+  @IsNumber()
+  @IsOptional()
+  tankId?: number
 }
 export class GetAllPaginationParam {
   @IsNumberString()

@@ -34,6 +34,7 @@ export class PostService {
         data: {
           profileId: user.profileId,
           description: post.description,
+          tankId: post.tankId,
           Photos: {
             createMany: {
               data: imagePaths
@@ -135,8 +136,82 @@ export class PostService {
     }
   }
 
-  findOne(id: GetPostByIdDto) {
-    return `This action returns a #${id} post`
+  async findOne(id: number) {
+    try {
+      return await this.prismaService.post.findFirst({
+        where: {
+          id
+        },
+        include: {
+          Profile: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              avatar: true
+            }
+          },
+          Photos: {
+            select: {
+              id: true,
+              url: true
+            }
+          },
+          Tank: {
+            select: {
+              avatar: true,
+              born: true,
+              co2: true,
+              dayLight: true,
+              description: true,
+              filter: true,
+              gravel: true,
+              height: true,
+              length: true,
+              light: true,
+              location: true,
+              name: true,
+              width: true,
+              id: true,
+              TankFertilizer: {
+                select: {
+                  amount: true,
+                  Fertilizer: {
+                    select: {
+                      avatar: true,
+                      name: true,
+                      unit: true,
+                      id: true,
+                      Brand: {
+                        select: {
+                          name: true,
+                          logo: true,
+                          website: true,
+                          id: true
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              TankPlant: {
+                select: {
+                  Plant: {
+                    select: {
+                      avatar: true,
+                      name: true,
+                      id: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      })
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {

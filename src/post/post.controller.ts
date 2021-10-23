@@ -11,7 +11,12 @@ import {
 } from '@nestjs/common'
 
 import { PostService } from './post.service'
-import { GetPostByIdDto, CreatePostDto, UpdatePostDto } from './dto/post.dto'
+import {
+  GetPostByIdDto,
+  CreatePostDto,
+  UpdatePostDto,
+  GetAllPaginationParam
+} from './dto/post.dto'
 import ReqWithUser from 'src/auth/reqWithUser.interface'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 
@@ -25,10 +30,10 @@ export class PostController {
     return this.postService.create(createPostDto, req.user)
   }
 
-  @Get()
+  @Get('paginate/:take/:cursor')
   @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.postService.findAll()
+  findAllPaginated(@Param() { take, cursor }: GetAllPaginationParam) {
+    return this.postService.findAllPaginated(Number(take), Number(cursor))
   }
 
   @Get(':id')

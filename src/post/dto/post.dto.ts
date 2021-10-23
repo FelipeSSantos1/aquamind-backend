@@ -19,4 +19,11 @@ export class CreatePostDto {
   @IsOptional()
   description?: string
 }
+export class GetAllPaginationParam {
+  @IsNumberString()
+  take: string
+
+  @IsNumberString()
+  cursor: string
+}
 export class UpdatePostDto {}

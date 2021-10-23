@@ -59,36 +59,77 @@ export class PostService {
     }
   }
 
-  findAll() {
+  async findAllPaginated(take = 10, cursor = 0) {
     try {
-      return this.prismaService.post.findMany({
-        include: {
-          Photos: {
-            select: {
-              id: true,
-              url: true
+      if (!cursor) {
+        const firstQuery = await this.prismaService.post.findMany({
+          take,
+          include: {
+            Photos: {
+              select: {
+                id: true,
+                url: true
+              }
+            },
+            Profile: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                avatar: true,
+                country: true
+              }
+            },
+            _count: {
+              select: {
+                Comment: true,
+                LikePost: true
+              }
             }
           },
-          Profile: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-              avatar: true,
-              country: true
-            }
-          },
-          _count: {
-            select: {
-              Comment: true,
-              LikePost: true
-            }
+          orderBy: {
+            id: 'desc'
           }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
-      })
+        })
+
+        return firstQuery
+      } else {
+        const nextQuery = await this.prismaService.post.findMany({
+          take,
+          skip: 1,
+          cursor: {
+            id: cursor
+          },
+          include: {
+            Photos: {
+              select: {
+                id: true,
+                url: true
+              }
+            },
+            Profile: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                avatar: true,
+                country: true
+              }
+            },
+            _count: {
+              select: {
+                Comment: true,
+                LikePost: true
+              }
+            }
+          },
+          orderBy: {
+            id: 'desc'
+          }
+        })
+
+        return nextQuery
+      }
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong')
     }

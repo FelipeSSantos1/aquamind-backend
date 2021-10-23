@@ -359,7 +359,6 @@ export class TankService {
         if (error.code === PrismaError.RecordDoesNotExist) {
           throw new NotFoundException('Tank not found')
         }
-        throw new InternalServerErrorException('Something went wrong')
       }
       throw new InternalServerErrorException('Something went wrong')
     }

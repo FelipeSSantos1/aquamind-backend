@@ -54,7 +54,7 @@ export class PostController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: GetPostByIdDto) {
-    return this.postService.remove(id)
+  remove(@Param() { id }: FindOneParam) {
+    return this.postService.remove(Number(id))
   }
 }

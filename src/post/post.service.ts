@@ -218,7 +218,23 @@ export class PostService {
     return `This action updates a #${id} post`
   }
 
-  remove(id: GetPostByIdDto) {
-    return `This action removes a #${id} post`
+  async remove(id: number) {
+    try {
+      return await this.prismaService.post.delete({
+        where: {
+          id
+        }
+      })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Post not found')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 }

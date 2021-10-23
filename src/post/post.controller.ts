@@ -3,16 +3,15 @@ import {
   Get,
   Post,
   Body,
-  Put,
   Param,
   Delete,
   Req,
-  UseGuards
+  UseGuards,
+  Patch
 } from '@nestjs/common'
 
 import { PostService } from './post.service'
 import {
-  GetPostByIdDto,
   CreatePostDto,
   UpdatePostDto,
   GetAllPaginationParam
@@ -43,13 +42,10 @@ export class PostController {
     return this.postService.findOne(Number(id))
   }
 
-  @Put(':id')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(
-    @Param('id') id: GetPostByIdDto,
-    @Body() updatePostDto: UpdatePostDto
-  ) {
-    return this.postService.update(+id, updatePostDto)
+  update(@Param() { id }: FindOneParam, @Body() post: UpdatePostDto) {
+    return this.postService.update(Number(id), post)
   }
 
   @Delete(':id')

@@ -7,10 +7,6 @@ import {
   IsNumber
 } from 'class-validator'
 
-export class GetPostByIdDto {
-  @IsNumberString()
-  id: string
-}
 export class CreatePostDto {
   @IsArray()
   @IsBase64({ each: true })
@@ -31,4 +27,12 @@ export class GetAllPaginationParam {
   @IsNumberString()
   cursor: string
 }
-export class UpdatePostDto {}
+export class UpdatePostDto {
+  @IsString()
+  @IsOptional()
+  description?: string
+
+  @IsNumber()
+  @IsOptional()
+  tankId?: number
+}

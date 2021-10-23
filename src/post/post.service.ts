@@ -10,7 +10,7 @@ import _ from 'lodash'
 import { FilesService } from 'src/files/files.service'
 import { PrismaService } from 'src/prisma.service'
 import { PrismaError } from 'src/utils/prismaError'
-import { GetPostByIdDto, CreatePostDto, UpdatePostDto } from './dto/post.dto'
+import { CreatePostDto, UpdatePostDto } from './dto/post.dto'
 
 @Injectable()
 export class PostService {
@@ -214,8 +214,36 @@ export class PostService {
     }
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`
+  async update(id: number, post: UpdatePostDto) {
+    try {
+      const result = await this.prismaService.post.update({
+        where: {
+          id
+        },
+        data: {
+          ...post
+        }
+      })
+
+      if (!result) throw new NotFoundException()
+      return result
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Post not found')
+      }
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Post not found')
+        }
+        if (error.code === PrismaError.ForeignKeyConstraint) {
+          throw new NotFoundException('Tank not found constraint')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
   }
 
   async remove(id: number) {

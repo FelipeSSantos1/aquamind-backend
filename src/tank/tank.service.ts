@@ -265,6 +265,9 @@ export class TankService {
       if (!result) throw new NotFoundException()
       return result
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Tank not found')
+      }
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')
       }
@@ -332,6 +335,9 @@ export class TankService {
       if (!result) throw new NotFoundException()
       return result
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Tank not found')
+      }
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')
       }

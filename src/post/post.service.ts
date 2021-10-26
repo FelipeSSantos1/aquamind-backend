@@ -215,8 +215,18 @@ export class PostService {
     }
   }
 
-  async update(id: number, post: UpdatePostDto) {
+  async update(id: number, post: UpdatePostDto, user: User) {
     try {
+      const postResponse = await this.findOne(id)
+
+      if (
+        postResponse &&
+        postResponse.profileId !== user.profileId &&
+        user.role !== Role.ADMIN
+      ) {
+        throw new ForbiddenException()
+      }
+
       const result = await this.prismaService.post.update({
         where: {
           id
@@ -229,6 +239,9 @@ export class PostService {
       if (!result) throw new NotFoundException()
       return result
     } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('You are not allowed to update this post')
+      }
       if (error instanceof NotFoundException) {
         throw new NotFoundException('Post not found')
       }

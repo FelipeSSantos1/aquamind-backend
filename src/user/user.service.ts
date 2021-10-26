@@ -1,11 +1,12 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException
 } from '@nestjs/common'
-import { Prisma, TokenType } from '@prisma/client'
+import { Prisma, Role, TokenType, User } from '@prisma/client'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import crypto from 'crypto'
@@ -148,79 +149,98 @@ export class UserService {
     }
   }
 
-  async deleteUser({ id }: UserIdDto) {
-    if (id) {
-      try {
-        await this.prismaService.user.delete({
-          where: {
-            id
-          }
-        })
-        return true
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === PrismaError.RecordDoesNotExist) {
-            throw new NotFoundException('User to delete does not exist')
-          }
-        }
-        throw new BadRequestException()
+  async deleteUser({ id }: UserIdDto, user: User) {
+    try {
+      if (user.id !== id && user.role !== Role.ADMIN) {
+        throw new ForbiddenException()
       }
+
+      await this.prismaService.user.delete({
+        where: {
+          id
+        }
+      })
+      return true
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('You are not allowed to delete this user')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('User to delete does not exist')
+        }
+      }
+      throw new BadRequestException()
     }
   }
 
-  async deactiveUser({ id }: UserIdDto) {
-    if (id) {
-      try {
-        const result = await this.prismaService.user.update({
-          where: {
-            id
-          },
-          data: {
-            active: false
-          },
-          include: {
-            Profile: true
-          }
-        })
-
-        result.password = undefined
-        return result
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === PrismaError.RecordDoesNotExist) {
-            throw new NotFoundException('User does not exist')
-          }
-        }
-        throw new BadRequestException()
+  async deactiveUser({ id }: UserIdDto, user: User) {
+    try {
+      if (user.id !== id && user.role !== Role.ADMIN) {
+        throw new ForbiddenException()
       }
+
+      const result = await this.prismaService.user.update({
+        where: {
+          id
+        },
+        data: {
+          active: false
+        },
+        include: {
+          Profile: true
+        }
+      })
+
+      result.password = undefined
+      return result
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException(
+          'You are not allowed to deactivate this user'
+        )
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('User does not exist')
+        }
+      }
+      throw new BadRequestException()
     }
   }
 
-  async activeUser({ id }: UserIdDto) {
-    if (id) {
-      try {
-        const result = await this.prismaService.user.update({
-          where: {
-            id
-          },
-          data: {
-            active: true
-          },
-          include: {
-            Profile: true
-          }
-        })
-
-        result.password = undefined
-        return result
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === PrismaError.RecordDoesNotExist) {
-            throw new NotFoundException('User does not exist')
-          }
-        }
-        throw new BadRequestException()
+  async activeUser({ id }: UserIdDto, user: User) {
+    try {
+      if (user.id !== id && user.role !== Role.ADMIN) {
+        throw new ForbiddenException()
       }
+
+      const result = await this.prismaService.user.update({
+        where: {
+          id
+        },
+        data: {
+          active: true
+        },
+        include: {
+          Profile: true
+        }
+      })
+
+      result.password = undefined
+      return result
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException(
+          'You are not allowed to activate this user'
+        )
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('User does not exist')
+        }
+      }
+      throw new BadRequestException()
     }
   }
 }

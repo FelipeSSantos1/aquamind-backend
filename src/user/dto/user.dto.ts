@@ -23,5 +23,6 @@ export class GetByEmailDto {
 
 export class UserIdDto {
   @IsUUID()
+  @IsNotEmpty()
   id: string
 }

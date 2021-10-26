@@ -193,9 +193,18 @@ export class TankService {
     }
   }
 
-  async update(id: number, tank: UpdateTankDto) {
+  async update(id: number, tank: UpdateTankDto, user: User) {
     const { plants, ferts, ...restTank } = tank
     try {
+      const tank = await this.findOne(id)
+      if (
+        tank &&
+        tank.profileId !== user.profileId &&
+        user.role !== Role.ADMIN
+      ) {
+        throw new ForbiddenException()
+      }
+
       await this.prismaService.tankFertilizer.deleteMany({
         where: {
           tankId: id
@@ -266,6 +275,9 @@ export class TankService {
       if (!result) throw new NotFoundException()
       return result
     } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('You are not allowed to update this tank')
+      }
       if (error instanceof NotFoundException) {
         throw new NotFoundException('Tank not found')
       }
@@ -282,12 +294,21 @@ export class TankService {
   }
 
   async updatePhoto(id: number, photo: UpdatePhotoDto, user: User) {
-    const uploadedFile = await this.filesService.uploadTankAvatar(
-      photo.avatar,
-      user.profileId
-    )
-
     try {
+      const tank = await this.findOne(id)
+      if (
+        tank &&
+        tank.profileId !== user.profileId &&
+        user.role !== Role.ADMIN
+      ) {
+        throw new ForbiddenException()
+      }
+
+      const uploadedFile = await this.filesService.uploadTankAvatar(
+        photo.avatar,
+        user.profileId
+      )
+
       const result = await this.prismaService.tank.update({
         where: {
           id
@@ -336,6 +357,9 @@ export class TankService {
       if (!result) throw new NotFoundException()
       return result
     } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('You are not allowed to update this tank')
+      }
       if (error instanceof NotFoundException) {
         throw new NotFoundException('Tank not found')
       }

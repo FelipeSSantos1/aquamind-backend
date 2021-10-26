@@ -9,17 +9,18 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  active    Boolean  @default(false)
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  active        Boolean  @default(false)
+  emailVerified Boolean  @default(false)
+  role          Role     @default(USER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   // Relation & index --------------
-  profileId Int?     @unique
-  Profile   Profile? @relation(fields: [profileId], references: [id])
-  Tokens    Token[]
+  profileId     Int?     @unique
+  Profile       Profile? @relation(fields: [profileId], references: [id])
+  Tokens        Token[]
 
   @@index([email])
   @@index([active])

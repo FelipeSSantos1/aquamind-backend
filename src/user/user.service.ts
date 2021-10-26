@@ -253,7 +253,7 @@ export class UserService {
 
   async verifyEmail(user: User) {
     try {
-      return await this.prismaService.user.update({
+      const result = await this.prismaService.user.update({
         where: {
           id: user.id
         },
@@ -262,6 +262,9 @@ export class UserService {
           emailVerified: true
         }
       })
+
+      result.password = undefined
+      return result
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaError.RecordDoesNotExist) {

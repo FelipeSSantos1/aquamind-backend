@@ -6,7 +6,10 @@ import { ConfigService } from '@nestjs/config'
 import { UserService } from 'src/user/user.service'
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtVerifyEmailStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-verify-email'
+) {
   constructor(
     private readonly configService: ConfigService,
     private readonly userService: UserService
@@ -14,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_ACCESS_TOKEN_SECRET')
+      secretOrKey: configService.get('JWT_VERIFY_EMAIL_TOKEN')
     })
   }
 

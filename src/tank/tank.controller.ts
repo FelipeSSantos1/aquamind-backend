@@ -40,8 +40,12 @@ export class TankController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(@Param() { id }: FindOneParam, @Body() tank: UpdateTankDto) {
-    return this.tankService.update(Number(id), tank)
+  update(
+    @Param() { id }: FindOneParam,
+    @Body() tank: UpdateTankDto,
+    @Req() req: ReqWithUser
+  ) {
+    return this.tankService.update(Number(id), tank, req.user)
   }
 
   @Patch('updatePhoto/:id')

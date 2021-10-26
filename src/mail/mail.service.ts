@@ -43,14 +43,14 @@ export class MailService {
     }
   }
 
-  async confirmEmail(token: string, email: string) {
+  async confirmEmail(token: string, email: string, expiresIn: string) {
     const config = new ConfigService()
     const url = `${config.get('MAIL_CONFIRMATION_ENDPOINT')}/${token}`
     return await this.sendMail({
       to: email,
       subject: 'Confirm your email',
       template: 'email-confirmation',
-      params: { url, email },
+      params: { url, email, expiresIn },
       text: `confirm your email accessing ${url}`
     })
   }

@@ -328,7 +328,6 @@ export class PostService {
         }
       })
     } catch (error) {
-      console.log({ error })
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')
       }

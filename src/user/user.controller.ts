@@ -4,12 +4,13 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   Req,
   UseGuards
 } from '@nestjs/common'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
+import { JwtVerifyEmailGuard } from 'src/auth/jwtVerifyEmail.guard'
 import ReqWithUser from 'src/auth/reqWithUser.interface'
 import { AddUserDto, GetByEmailDto, UserIdDto } from './dto/user.dto'
 import { UserService } from './user.service'
@@ -47,15 +48,21 @@ export class UserController {
     return this.userService.deleteUser({ id }, req.user)
   }
 
-  @Put('deactivate')
+  @Patch('deactivate')
   @UseGuards(JwtAuthGuard)
   async deactiveUser(@Body() body: UserIdDto, @Req() req: ReqWithUser) {
     return this.userService.deactiveUser(body, req.user)
   }
 
-  @Put('activate')
+  @Patch('activate')
   @UseGuards(JwtAuthGuard)
   async activeUser(@Body() body: UserIdDto, @Req() req: ReqWithUser) {
     return this.userService.activeUser(body, req.user)
+  }
+
+  @Patch('verifyEmail')
+  @UseGuards(JwtVerifyEmailGuard)
+  async verifyEmail(@Req() req: ReqWithUser) {
+    return this.userService.verifyEmail(req.user)
   }
 }

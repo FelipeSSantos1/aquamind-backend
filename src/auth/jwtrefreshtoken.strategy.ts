@@ -26,19 +26,23 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
   }
 
   async validate(request: Request, payload: TokenPayload) {
-    const user = await this.userService.getByIdWithRefreshToken({
-      id: payload.userId
-    })
-    const refreshToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request)
+    try {
+      const user = await this.userService.getByIdWithRefreshToken({
+        id: payload.userId
+      })
+      const refreshToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request)
 
-    if (user?.Tokens?.length) {
-      const token = user.Tokens[0]
-      const isSameToken = createHash(refreshToken) === token.token
-      const isExpired = moment().isAfter(token.expiration)
+      if (user?.Tokens?.length) {
+        const token = user.Tokens[0]
+        const isSameToken = createHash(refreshToken) === token.token
+        const isExpired = moment().isAfter(token.expiration)
 
-      if (isSameToken && token.valid && !isExpired) return user
+        if (isSameToken && token.valid && !isExpired) return user
+      }
+
+      return null
+    } catch (error) {
+      return null
     }
-
-    return null
   }
 }

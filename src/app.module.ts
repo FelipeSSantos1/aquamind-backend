@@ -10,12 +10,14 @@ import { FertilizerModule } from './fertilizer/fertilizer.module'
 import { PostModule } from './post/post.module'
 import { TankModule } from './tank/tank.module'
 import { FilesModule } from './files/files.module'
-import { CommentModule } from './comment/comment.module';
+import { CommentModule } from './comment/comment.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        JWT_VERIFY_EMAIL_TOKEN: Joi.string().required(),
+        JWT_VERIFY_EMAIL_EXPIRATION_TIME: Joi.string().required(),
         JWT_ACCESS_TOKEN_SECRET: Joi.string().required(),
         JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
         JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),

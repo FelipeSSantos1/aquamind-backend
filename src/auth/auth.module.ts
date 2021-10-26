@@ -10,6 +10,7 @@ import { LocalStrategy } from './local.strategy'
 import { AuthController } from './auth.controller'
 import { JwtStrategy } from './jwt.strategy'
 import { JwtRefreshTokenStrategy } from './jwtrefreshtoken.strategy'
+import { JwtVerifyEmailStrategy } from './jwtVerifyEmail.strategy'
 
 @Module({
   imports: [UserModule, PassportModule, ConfigModule, JwtModule.register({})],
@@ -17,6 +18,7 @@ import { JwtRefreshTokenStrategy } from './jwtrefreshtoken.strategy'
     LocalStrategy,
     JwtStrategy,
     JwtRefreshTokenStrategy,
+    JwtVerifyEmailStrategy,
     AuthService,
     PrismaService
   ],

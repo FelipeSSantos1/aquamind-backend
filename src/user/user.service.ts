@@ -115,26 +115,33 @@ export class UserService {
           }
         })
 
-        const expiration = moment().add(10, 'minutes').toDate()
+        const expiration = moment().add(
+          this.configService.get('JWT_VERIFY_EMAIL_EXPIRATION_TIME'),
+          'minutes'
+        )
         const token = this.jwtService.sign(
           { userId: result.id },
           {
-            secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+            secret: this.configService.get('JWT_VERIFY_EMAIL_TOKEN'),
             expiresIn: `${this.configService.get(
-              'JWT_ACCESS_TOKEN_EXPIRATION_TIME'
+              'JWT_VERIFY_EMAIL_EXPIRATION_TIME'
             )}m`
           }
         )
         await this.prismaService.token.create({
           data: {
-            expiration,
+            expiration: expiration.toDate(),
             type: TokenType.EMAIL,
             token,
             userId: result.id
           }
         })
 
-        const emailSent = await this.mailService.confirmEmail(token, email)
+        const emailSent = await this.mailService.confirmEmail(
+          token,
+          email,
+          expiration.utc().toString()
+        )
 
         result.password = undefined
         return { ...result, emailSent }
@@ -235,6 +242,27 @@ export class UserService {
           'You are not allowed to activate this user'
         )
       }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('User does not exist')
+        }
+      }
+      throw new BadRequestException()
+    }
+  }
+
+  async verifyEmail(user: User) {
+    try {
+      return await this.prismaService.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          active: true,
+          emailVerified: true
+        }
+      })
+    } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaError.RecordDoesNotExist) {
           throw new NotFoundException('User does not exist')

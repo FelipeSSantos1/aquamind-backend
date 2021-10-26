@@ -36,3 +36,8 @@ export class UpdatePostDto {
   @IsOptional()
   tankId?: number
 }
+
+export class LikePostDto {
+  @IsNumber()
+  postId: number
+}

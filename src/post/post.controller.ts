@@ -14,7 +14,8 @@ import { PostService } from './post.service'
 import {
   CreatePostDto,
   UpdatePostDto,
-  GetAllPaginationParam
+  GetAllPaginationParam,
+  LikePostDto
 } from './dto/post.dto'
 import ReqWithUser from 'src/auth/reqWithUser.interface'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
@@ -22,12 +23,24 @@ import { FindOneParam } from 'src/utils/findOneParam'
 
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@Body() createPostDto: CreatePostDto, @Req() req: ReqWithUser) {
     return this.postService.create(createPostDto, req.user)
+  }
+
+  @Post('like')
+  @UseGuards(JwtAuthGuard)
+  likePost(@Body() likePostDto: LikePostDto, @Req() req: ReqWithUser) {
+    return this.postService.likePost(req.user, likePostDto.postId)
+  }
+
+  @Delete('like/:id')
+  @UseGuards(JwtAuthGuard)
+  dislikePost(@Param() { id }: FindOneParam, @Req() req: ReqWithUser) {
+    return this.postService.dislikePost(req.user, Number(id))
   }
 
   @Get('paginate/:take/:cursor')

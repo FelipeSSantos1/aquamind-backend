@@ -17,7 +17,7 @@ export class PostService {
   constructor(
     private readonly filesService: FilesService,
     private readonly prismaService: PrismaService
-  ) {}
+  ) { }
 
   async create(post: CreatePostDto, user: User) {
     const fileNames = await this.filesService.uploadPostPhotos(
@@ -254,6 +254,54 @@ export class PostService {
         }
       })
     } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Post not found')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
+  }
+
+  async likePost(user: User, postId: number) {
+    try {
+      return await this.prismaService.likePost.create({
+        data: {
+          profileId: user.profileId,
+          postId
+        }
+      })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.ForeignKeyConstraint) {
+          throw new NotFoundException('Post not found')
+        }
+        if (error.code === PrismaError.UniqueConstraint) {
+          throw new NotFoundException('Post already liked')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
+  }
+
+  async dislikePost(user: User, postId: number) {
+    try {
+      return await this.prismaService.likePost.delete({
+        where: {
+          postId_profileId: {
+            profileId: user.profileId,
+            postId
+          }
+        }
+      })
+    } catch (error) {
+      console.log({ error })
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')
       }

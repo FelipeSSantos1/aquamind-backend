@@ -8,6 +8,7 @@ import {
 import { Prisma, TokenType } from '@prisma/client'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
+import crypto from 'crypto'
 import moment from 'moment'
 
 import { PrismaError } from 'src/utils/prismaError'
@@ -100,7 +101,16 @@ export class UserService {
         const result = await this.prismaService.user.create({
           data: {
             email,
-            password: createHash(password)
+            password: createHash(password),
+            profileId: (
+              await this.prismaService.profile.create({
+                data: {
+                  username: `${email.split('@')[0]}_${crypto
+                    .randomBytes(3)
+                    .toString('hex')}`
+                }
+              })
+            ).id
           }
         })
 

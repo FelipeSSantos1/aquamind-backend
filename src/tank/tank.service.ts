@@ -1,10 +1,11 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException
 } from '@nestjs/common'
-import { Prisma, User } from '@prisma/client'
+import { Prisma, Role, User } from '@prisma/client'
 
 import { PrismaService } from 'src/prisma.service'
 import { PrismaError } from 'src/utils/prismaError'
@@ -350,14 +351,26 @@ export class TankService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: User) {
     try {
+      const tank = await this.findOne(id)
+      if (
+        tank &&
+        tank.profileId !== user.profileId &&
+        user.role !== Role.ADMIN
+      ) {
+        throw new ForbiddenException()
+      }
+
       return await this.prismaService.tank.delete({
         where: {
           id
         }
       })
     } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('You are not allowed to delete this tank')
+      }
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')
       }

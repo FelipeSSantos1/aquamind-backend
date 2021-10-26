@@ -23,7 +23,7 @@ import { FindOneParam } from 'src/utils/findOneParam'
 
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) { }
+  constructor(private readonly postService: PostService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -63,7 +63,7 @@ export class PostController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param() { id }: FindOneParam) {
-    return this.postService.remove(Number(id))
+  remove(@Param() { id }: FindOneParam, @Req() req: ReqWithUser) {
+    return this.postService.remove(Number(id), req.user)
   }
 }

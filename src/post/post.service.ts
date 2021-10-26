@@ -1,10 +1,11 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException
 } from '@nestjs/common'
-import { Prisma, User } from '@prisma/client'
+import { Prisma, Role, User } from '@prisma/client'
 import _ from 'lodash'
 
 import { FilesService } from 'src/files/files.service'
@@ -17,7 +18,7 @@ export class PostService {
   constructor(
     private readonly filesService: FilesService,
     private readonly prismaService: PrismaService
-  ) { }
+  ) {}
 
   async create(post: CreatePostDto, user: User) {
     const fileNames = await this.filesService.uploadPostPhotos(
@@ -246,14 +247,27 @@ export class PostService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: User) {
     try {
+      const post = await this.findOne(id)
+
+      if (
+        post &&
+        post.profileId !== user.profileId &&
+        user.role !== Role.ADMIN
+      ) {
+        throw new ForbiddenException()
+      }
+
       return await this.prismaService.post.delete({
         where: {
           id
         }
       })
     } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('You are not allowed to delete this post')
+      }
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')
       }

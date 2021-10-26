@@ -56,7 +56,7 @@ export class TankController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param() { id }: FindOneParam) {
-    return this.tankService.remove(Number(id))
+  remove(@Param() { id }: FindOneParam, @Req() req: ReqWithUser) {
+    return this.tankService.remove(Number(id), req.user)
   }
 }

@@ -10,6 +10,7 @@ import { FertilizerModule } from './fertilizer/fertilizer.module'
 import { PostModule } from './post/post.module'
 import { TankModule } from './tank/tank.module'
 import { FilesModule } from './files/files.module'
+import { CommentModule } from './comment/comment.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -37,7 +38,8 @@ import { FilesModule } from './files/files.module'
     FertilizerModule,
     PostModule,
     TankModule,
-    FilesModule
+    FilesModule,
+    CommentModule
   ],
   controllers: []
 })

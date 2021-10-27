@@ -12,7 +12,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 import { JwtVerifyEmailGuard } from 'src/auth/jwtVerifyEmail.guard'
 import ReqWithUser from 'src/auth/reqWithUser.interface'
-import { AddUserDto, GetByEmailDto, UserIdDto } from './dto/user.dto'
+import { AddUserDto, GetByEmailDto, UserIdDto, FollowDto } from './dto/user.dto'
 import { UserService } from './user.service'
 
 @Controller('user')
@@ -38,8 +38,14 @@ export class UserController {
   }
 
   @Post()
-  async addUser(@Body() body: AddUserDto) {
-    return this.userService.addUser(body)
+  async createUser(@Body() body: AddUserDto) {
+    return this.userService.createUser(body)
+  }
+
+  @Post('follow')
+  @UseGuards(JwtAuthGuard)
+  async follow(@Body() body: FollowDto, @Req() req: ReqWithUser) {
+    return this.userService.follow(body, req.user)
   }
 
   @Delete(':id')

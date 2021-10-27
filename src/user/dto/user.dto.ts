@@ -3,7 +3,8 @@ import {
   IsString,
   IsNotEmpty,
   MinLength,
-  IsUUID
+  IsUUID,
+  IsNumber
 } from 'class-validator'
 
 export class AddUserDto {
@@ -25,4 +26,9 @@ export class UserIdDto {
   @IsUUID()
   @IsNotEmpty()
   id: string
+}
+
+export class FollowDto {
+  @IsNumber()
+  id: number
 }

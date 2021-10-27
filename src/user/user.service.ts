@@ -15,7 +15,7 @@ import moment from 'moment'
 import { PrismaError } from 'src/utils/prismaError'
 import { MailService } from 'src/mail/mail.service'
 import { PrismaService } from 'src/prisma.service'
-import { AddUserDto, GetByEmailDto, UserIdDto } from './dto/user.dto'
+import { AddUserDto, GetByEmailDto, UserIdDto, FollowDto } from './dto/user.dto'
 import { createHash } from 'src/utils/crypt'
 
 @Injectable()
@@ -96,7 +96,7 @@ export class UserService {
     return result
   }
 
-  async addUser({ email, password }: AddUserDto) {
+  async createUser({ email, password }: AddUserDto) {
     if (email && password) {
       try {
         const result = await this.prismaService.user.create({
@@ -153,6 +153,27 @@ export class UserService {
         }
         throw new InternalServerErrorException('Something went wrong')
       }
+    }
+  }
+
+  async follow({ id }: FollowDto, user: User) {
+    try {
+      return await this.prismaService.follower.create({
+        data: {
+          idFollower: user.profileId,
+          idFollowing: id
+        }
+      })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.ForeignKeyConstraint) {
+          throw new BadRequestException("User doesn't exist")
+        }
+        if (error.code === PrismaError.UniqueConstraint) {
+          throw new ConflictException('You are already following this user')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
     }
   }
 

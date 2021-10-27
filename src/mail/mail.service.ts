@@ -4,7 +4,8 @@ import Mailgun from 'mailgun.js'
 import formData from 'form-data'
 import { ConfigService } from '@nestjs/config'
 
-import { sendMailProps } from './types'
+import { ForgotPasswordDto } from 'src/auth/dto/auth.dto'
+import { sendMailProps, forgotPasswordProps } from './types'
 
 @Injectable()
 export class MailService {
@@ -45,13 +46,30 @@ export class MailService {
 
   async confirmEmail(token: string, email: string, expiresIn: string) {
     const config = new ConfigService()
-    const url = `${config.get('MAIL_CONFIRMATION_ENDPOINT')}/${token}`
+    const url = `${config.get('MAIL_CONFIRMATION_ENDPOINT')}/token=${token}`
     return await this.sendMail({
       to: email,
       subject: 'Confirm your email',
       template: 'email-confirmation',
       params: { url, email, expiresIn },
       text: `confirm your email accessing ${url}`
+    })
+  }
+
+  async forgotPassword({
+    token,
+    email,
+    expiresIn,
+    ...params
+  }: forgotPasswordProps & ForgotPasswordDto) {
+    const config = new ConfigService()
+    const url = `${config.get('RESET_PASSWORD_ENDPOINT')}/token=${token}`
+    return await this.sendMail({
+      to: email,
+      subject: 'Reset your password',
+      template: 'reset-password',
+      params: { url, email, expiresIn, ...params },
+      text: `Reset your password accessing ${url}`
     })
   }
 }

@@ -5,3 +5,11 @@ export type sendMailProps = {
   template: string
   text?: string
 }
+
+export type forgotPasswordProps = {
+  token: string
+  email: string
+  name: string
+  ip: string
+  expiresIn: string
+}

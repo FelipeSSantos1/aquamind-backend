@@ -1,10 +1,19 @@
-import { Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  UseGuards
+} from '@nestjs/common'
 
 import ReqWithUser from './reqWithUser.interface'
 import { AuthService } from './auth.service'
 import { LocalAuthGuard } from './localAuth.guard'
 import { JwtRefreshTokenGuard } from './jwtRefreshToken.guard'
 import { JwtAuthGuard } from './jwtAuth.guard'
+import { ForgotPasswordDto } from './dto/auth.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -37,5 +46,10 @@ export class AuthController {
     const accessToken = this.authService.createAccessToken(req.user.id)
 
     return { accessToken }
+  }
+
+  @Post('forgotPassword')
+  async forgotPassword(@Body() body: ForgotPasswordDto) {
+    return this.authService.forgotPassword(body)
   }
 }

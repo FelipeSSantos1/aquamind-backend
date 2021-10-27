@@ -16,6 +16,9 @@ import { CommentModule } from './comment/comment.module'
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        RESET_PASSWORD_ENDPOINT: Joi.string().required(),
+        JWT_FORGOT_PASSWORD_TOKEN: Joi.string().required(),
+        JWT_FORGOT_PASSWORD_EXPIRATION_TIME: Joi.string().required(),
         JWT_VERIFY_EMAIL_TOKEN: Joi.string().required(),
         JWT_VERIFY_EMAIL_EXPIRATION_TIME: Joi.string().required(),
         JWT_ACCESS_TOKEN_SECRET: Joi.string().required(),

@@ -276,46 +276,45 @@ export class UserService {
     try {
       const user = await this.getByEmail({ email })
 
-      if (user) {
-        await this.prismaService.token.deleteMany({
-          where: {
-            userId: user.id,
-            type: TokenType.EMAIL
-          }
-        })
-
-        const expiration = moment().add(
-          this.configService.get('JWT_VERIFY_EMAIL_EXPIRATION_TIME'),
-          'minutes'
-        )
-        const token = this.jwtService.sign(
-          { userId: user.id },
-          {
-            secret: this.configService.get('JWT_VERIFY_EMAIL_TOKEN'),
-            expiresIn: `${this.configService.get(
-              'JWT_VERIFY_EMAIL_EXPIRATION_TIME'
-            )}m`
-          }
-        )
-        await this.prismaService.token.create({
-          data: {
-            expiration: expiration.toDate(),
-            type: TokenType.EMAIL,
-            token,
-            userId: user.id
-          }
-        })
-
-        const emailSent = await this.mailService.confirmEmail(
-          token,
-          email,
-          expiration.utc().toString()
-        )
-
-        return emailSent
+      if (!user) {
+        throw new NotFoundException()
       }
+      await this.prismaService.token.deleteMany({
+        where: {
+          userId: user.id,
+          type: TokenType.EMAIL
+        }
+      })
 
-      throw new NotFoundException()
+      const expiration = moment().add(
+        this.configService.get('JWT_VERIFY_EMAIL_EXPIRATION_TIME'),
+        'minutes'
+      )
+      const token = this.jwtService.sign(
+        { userId: user.id },
+        {
+          secret: this.configService.get('JWT_VERIFY_EMAIL_TOKEN'),
+          expiresIn: `${this.configService.get(
+            'JWT_VERIFY_EMAIL_EXPIRATION_TIME'
+          )}m`
+        }
+      )
+      await this.prismaService.token.create({
+        data: {
+          expiration: expiration.toDate(),
+          type: TokenType.EMAIL,
+          token,
+          userId: user.id
+        }
+      })
+
+      const emailSent = await this.mailService.confirmEmail(
+        token,
+        email,
+        expiration.utc().toString()
+      )
+
+      return emailSent
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException('Email does not exist in our system')

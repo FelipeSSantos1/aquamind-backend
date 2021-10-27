@@ -1,28 +1,34 @@
 import {
   BadRequestException,
   ForbiddenException,
-  Injectable
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
-import { TokenType } from '@prisma/client'
+import { Prisma, TokenType } from '@prisma/client'
 import moment from 'moment'
 
+import { MailService } from 'src/mail/mail.service'
 import { PrismaService } from 'src/prisma.service'
 import { UserService } from 'src/user/user.service'
 import { validateHash } from 'src/utils/crypt'
 import { createHash } from 'src/utils/crypt'
+import { PrismaError } from 'src/utils/prismaError'
+import { ForgotPasswordDto } from './dto/auth.dto'
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
+    private readonly mailService: MailService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService
   ) {}
 
-  public async getAuthenticatedUser(email: string, password: string) {
+  async getAuthenticatedUser(email: string, password: string) {
     try {
       const user = await this.userService.getByEmail({ email })
       const isPasswordMatching = validateHash(password, user.password)
@@ -35,7 +41,7 @@ export class AuthService {
     }
   }
 
-  public createAccessToken(userId: string) {
+  createAccessToken(userId: string) {
     const token = this.jwtService.sign(
       { userId },
       {
@@ -49,7 +55,7 @@ export class AuthService {
     return token
   }
 
-  public async createRefreshToken(userId: string) {
+  async createRefreshToken(userId: string) {
     const token = this.jwtService.sign(
       { userId },
       {
@@ -89,7 +95,7 @@ export class AuthService {
     }
   }
 
-  public async deleteRefreshToken(userId: string) {
+  async deleteRefreshToken(userId: string) {
     try {
       await this.prismaService.token.deleteMany({
         where: {
@@ -101,6 +107,62 @@ export class AuthService {
       return true
     } catch (error) {
       throw new BadRequestException()
+    }
+  }
+
+  async forgotPassword(params: ForgotPasswordDto) {
+    try {
+      const user = await this.userService.getByEmail({ email: params.email })
+      if (!user) {
+        throw new NotFoundException()
+      }
+      await this.prismaService.token.deleteMany({
+        where: {
+          userId: user.id,
+          type: TokenType.FORGOTPASSWORD
+        }
+      })
+
+      const expiration = moment().add(
+        this.configService.get('JWT_FORGOT_PASSWORD_EXPIRATION_TIME'),
+        'minutes'
+      )
+      const token = this.jwtService.sign(
+        { userId: user.id },
+        {
+          secret: this.configService.get('JWT_FORGOT_PASSWORD_TOKEN'),
+          expiresIn: `${this.configService.get(
+            'JWT_FORGOT_PASSWORD_EXPIRATION_TIME'
+          )}m`
+        }
+      )
+      await this.prismaService.token.create({
+        data: {
+          expiration: expiration.toDate(),
+          type: TokenType.FORGOTPASSWORD,
+          token,
+          userId: user.id
+        }
+      })
+
+      const emailSent = await this.mailService.forgotPassword({
+        ...params,
+        token,
+        name: user.Profile.username,
+        expiresIn: expiration.utc().toString()
+      })
+
+      return { emailSent }
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Email does not exist in our system')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Email does not exist')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
     }
   }
 }

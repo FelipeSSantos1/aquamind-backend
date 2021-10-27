@@ -15,6 +15,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     const user = await this.authService.getAuthenticatedUser(email, password)
 
     if (!user) throw new ForbiddenException('Wrong credentials provided')
+    if (!user.active) throw new ForbiddenException('Account not active')
+    if (!user.emailVerified) throw new ForbiddenException('Email not verified')
 
     return user
   }

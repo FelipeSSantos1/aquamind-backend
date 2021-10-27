@@ -88,4 +88,19 @@ export class AuthService {
       throw new BadRequestException()
     }
   }
+
+  public async deleteRefreshToken(userId: string) {
+    try {
+      await this.prismaService.token.deleteMany({
+        where: {
+          userId,
+          type: TokenType.REFRESHTOKEN
+        }
+      })
+
+      return true
+    } catch (error) {
+      throw new BadRequestException()
+    }
+  }
 }

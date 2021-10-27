@@ -4,6 +4,7 @@ import ReqWithUser from './reqWithUser.interface'
 import { AuthService } from './auth.service'
 import { LocalAuthGuard } from './localAuth.guard'
 import { JwtRefreshTokenGuard } from './jwtRefreshToken.guard'
+import { JwtAuthGuard } from './jwtAuth.guard'
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +20,14 @@ export class AuthController {
     user.password = undefined
 
     return { ...user, accessToken, refreshToken }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('logout')
+  async logout(@Req() req: ReqWithUser) {
+    const { user } = req
+
+    return this.authService.deleteRefreshToken(user.id)
   }
 
   @HttpCode(200)

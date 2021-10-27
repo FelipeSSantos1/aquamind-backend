@@ -272,6 +272,63 @@ export class UserService {
     }
   }
 
+  async sendVerifyEmail(email: string) {
+    try {
+      const user = await this.getByEmail({ email })
+
+      if (user) {
+        await this.prismaService.token.deleteMany({
+          where: {
+            userId: user.id,
+            type: TokenType.EMAIL
+          }
+        })
+
+        const expiration = moment().add(
+          this.configService.get('JWT_VERIFY_EMAIL_EXPIRATION_TIME'),
+          'minutes'
+        )
+        const token = this.jwtService.sign(
+          { userId: user.id },
+          {
+            secret: this.configService.get('JWT_VERIFY_EMAIL_TOKEN'),
+            expiresIn: `${this.configService.get(
+              'JWT_VERIFY_EMAIL_EXPIRATION_TIME'
+            )}m`
+          }
+        )
+        await this.prismaService.token.create({
+          data: {
+            expiration: expiration.toDate(),
+            type: TokenType.EMAIL,
+            token,
+            userId: user.id
+          }
+        })
+
+        const emailSent = await this.mailService.confirmEmail(
+          token,
+          email,
+          expiration.utc().toString()
+        )
+
+        return emailSent
+      }
+
+      throw new NotFoundException()
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Email does not exist in our system')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Email does not exist')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
+  }
+
   async verifyEmail(user: User) {
     try {
       const result = await this.prismaService.user.update({
@@ -284,6 +341,13 @@ export class UserService {
         }
       })
 
+      await this.prismaService.token.deleteMany({
+        where: {
+          userId: user.id,
+          type: TokenType.EMAIL
+        }
+      })
+
       result.password = undefined
       return result
     } catch (error) {
@@ -292,7 +356,7 @@ export class UserService {
           throw new NotFoundException('User does not exist')
         }
       }
-      throw new BadRequestException()
+      throw new InternalServerErrorException('Something went wrong')
     }
   }
 }

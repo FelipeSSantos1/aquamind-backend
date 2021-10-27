@@ -32,3 +32,8 @@ export class FollowDto {
   @IsNumber()
   id: number
 }
+
+export class SendVerifyEmail {
+  @IsEmail()
+  email: string
+}

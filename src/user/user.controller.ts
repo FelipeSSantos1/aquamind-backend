@@ -12,7 +12,13 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 import { JwtVerifyEmailGuard } from 'src/auth/jwtVerifyEmail.guard'
 import ReqWithUser from 'src/auth/reqWithUser.interface'
-import { AddUserDto, GetByEmailDto, UserIdDto, FollowDto } from './dto/user.dto'
+import {
+  AddUserDto,
+  GetByEmailDto,
+  UserIdDto,
+  FollowDto,
+  SendVerifyEmail
+} from './dto/user.dto'
 import { UserService } from './user.service'
 
 @Controller('user')
@@ -70,5 +76,10 @@ export class UserController {
   @UseGuards(JwtVerifyEmailGuard)
   async verifyEmail(@Req() req: ReqWithUser) {
     return this.userService.verifyEmail(req.user)
+  }
+
+  @Post('sendVerifyEmail')
+  async sendVerifyEmail(@Body() { email }: SendVerifyEmail) {
+    return this.userService.sendVerifyEmail(email)
   }
 }

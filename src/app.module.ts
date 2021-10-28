@@ -11,8 +11,14 @@ import { PostModule } from './post/post.module'
 import { TankModule } from './tank/tank.module'
 import { FilesModule } from './files/files.module'
 import { CommentModule } from './comment/comment.module'
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
+import { APP_GUARD } from '@nestjs/core'
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
@@ -46,6 +52,11 @@ import { CommentModule } from './comment/comment.module'
     FilesModule,
     CommentModule
   ],
-  controllers: []
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ]
 })
 export class AppModule {}

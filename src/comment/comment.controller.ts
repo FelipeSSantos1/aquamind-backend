@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards
 } from '@nestjs/common'
+import { Throttle } from '@nestjs/throttler'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 
 import ReqWithUser from 'src/auth/reqWithUser.interface'
@@ -38,12 +39,14 @@ export class CommentController {
   }
 
   @Post('like')
+  @Throttle(30, 60)
   @UseGuards(JwtAuthGuard)
   likeComment(@Body() likeCommentDto: LikeCommentDto, @Req() req: ReqWithUser) {
     return this.commentService.likeComment(req.user, likeCommentDto.commentId)
   }
 
   @Delete('like/:id')
+  @Throttle(30, 60)
   @UseGuards(JwtAuthGuard)
   dislikeComment(@Param() { id }: FindOneParam, @Req() req: ReqWithUser) {
     return this.commentService.dislikeComment(req.user, Number(id))

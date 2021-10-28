@@ -20,6 +20,7 @@ import {
 import ReqWithUser from 'src/auth/reqWithUser.interface'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 import { FindOneParam } from 'src/utils/findOneParam'
+import { Throttle } from '@nestjs/throttler'
 
 @Controller('post')
 export class PostController {
@@ -32,18 +33,21 @@ export class PostController {
   }
 
   @Post('like')
+  @Throttle(30, 60)
   @UseGuards(JwtAuthGuard)
   likePost(@Body() likePostDto: LikePostDto, @Req() req: ReqWithUser) {
     return this.postService.likePost(req.user, likePostDto.postId)
   }
 
   @Delete('like/:id')
+  @Throttle(30, 60)
   @UseGuards(JwtAuthGuard)
   dislikePost(@Param() { id }: FindOneParam, @Req() req: ReqWithUser) {
     return this.postService.dislikePost(req.user, Number(id))
   }
 
   @Get('paginate/:take/:cursor')
+  @Throttle(30, 60)
   @UseGuards(JwtAuthGuard)
   findAllPaginated(@Param() { take, cursor }: GetAllPaginationParam) {
     return this.postService.findAllPaginated(Number(take), Number(cursor))

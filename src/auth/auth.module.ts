@@ -11,6 +11,7 @@ import { AuthController } from './auth.controller'
 import { JwtStrategy } from './jwt.strategy'
 import { JwtRefreshTokenStrategy } from './jwtrefreshtoken.strategy'
 import { JwtVerifyEmailStrategy } from './jwtVerifyEmail.strategy'
+import { JwtResetPasswordStrategy } from './jwtResetPassword.strategy'
 import { MailService } from 'src/mail/mail.service'
 
 @Module({
@@ -20,6 +21,7 @@ import { MailService } from 'src/mail/mail.service'
     JwtStrategy,
     JwtRefreshTokenStrategy,
     JwtVerifyEmailStrategy,
+    JwtResetPasswordStrategy,
     AuthService,
     PrismaService,
     MailService

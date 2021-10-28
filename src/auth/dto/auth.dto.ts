@@ -25,3 +25,10 @@ export class ForgotPasswordDto {
   @IsNotEmpty()
   device: string
 }
+
+export class ResetPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(7)
+  password: string
+}

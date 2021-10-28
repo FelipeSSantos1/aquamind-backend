@@ -12,8 +12,9 @@ import ReqWithUser from './reqWithUser.interface'
 import { AuthService } from './auth.service'
 import { LocalAuthGuard } from './localAuth.guard'
 import { JwtRefreshTokenGuard } from './jwtRefreshToken.guard'
+import { JwtResetPasswordGuard } from './jwtResetPassword.guard'
 import { JwtAuthGuard } from './jwtAuth.guard'
-import { ForgotPasswordDto } from './dto/auth.dto'
+import { ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto'
 import { Throttle } from '@nestjs/throttler'
 
 @Controller('auth')
@@ -53,5 +54,15 @@ export class AuthController {
   @Throttle(2, 60)
   async forgotPassword(@Body() body: ForgotPasswordDto) {
     return this.authService.forgotPassword(body)
+  }
+
+  @Post('resetPassword')
+  @Throttle(2, 60)
+  @UseGuards(JwtResetPasswordGuard)
+  async resetPassword(
+    @Body() { password }: ResetPasswordDto,
+    @Req() req: ReqWithUser
+  ) {
+    return this.authService.resetPassword(password, req.user)
   }
 }

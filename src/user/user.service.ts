@@ -60,6 +60,52 @@ export class UserService {
     }
   }
 
+  async getByIdWithEmailToken({ id }: UserIdDto) {
+    try {
+      const result = await this.prismaService.user.findUnique({
+        where: {
+          id
+        },
+        include: {
+          Profile: true,
+          Tokens: {
+            where: {
+              type: TokenType.EMAIL
+            }
+          }
+        }
+      })
+
+      result.password = undefined
+      return result
+    } catch (error) {
+      throw new BadRequestException()
+    }
+  }
+
+  async getByIdWithForgotPasswordToken({ id }: UserIdDto) {
+    try {
+      const result = await this.prismaService.user.findUnique({
+        where: {
+          id
+        },
+        include: {
+          Profile: true,
+          Tokens: {
+            where: {
+              type: TokenType.FORGOTPASSWORD
+            }
+          }
+        }
+      })
+
+      result.password = undefined
+      return result
+    } catch (error) {
+      throw new BadRequestException()
+    }
+  }
+
   async getByIdWithRefreshToken({ id }: UserIdDto) {
     try {
       const result = await this.prismaService.user.findUnique({

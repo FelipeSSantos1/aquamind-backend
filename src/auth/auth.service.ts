@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
-import { Prisma, TokenType } from '@prisma/client'
+import { Prisma, TokenType, User } from '@prisma/client'
 import moment from 'moment'
 
 import { MailService } from 'src/mail/mail.service'
@@ -160,6 +160,39 @@ export class AuthService {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaError.RecordDoesNotExist) {
           throw new NotFoundException('Email does not exist')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
+  }
+
+  async resetPassword(password: string, user: User) {
+    try {
+      await this.prismaService.token.deleteMany({
+        where: {
+          userId: user.id,
+          type: TokenType.FORGOTPASSWORD
+        }
+      })
+
+      const updatedUser = await this.prismaService.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          password: createHash(password)
+        }
+      })
+      updatedUser.password = undefined
+
+      return updatedUser
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('User does not exist in our system')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('User does not exist')
         }
       }
       throw new InternalServerErrorException('Something went wrong')

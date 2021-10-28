@@ -7,9 +7,9 @@ import { ConfigService } from '@nestjs/config'
 import { UserService } from 'src/user/user.service'
 
 @Injectable()
-export class JwtVerifyEmailStrategy extends PassportStrategy(
+export class JwtResetPasswordStrategy extends PassportStrategy(
   Strategy,
-  'jwt-verify-email'
+  'jwt-reset-password'
 ) {
   constructor(
     private readonly configService: ConfigService,
@@ -18,17 +18,16 @@ export class JwtVerifyEmailStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_VERIFY_EMAIL_TOKEN'),
+      secretOrKey: configService.get('JWT_FORGOT_PASSWORD_TOKEN'),
       passReqToCallback: true
     })
   }
 
   async validate(request: Request, payload: TokenPayload) {
     try {
-      const user = await this.userService.getByIdWithEmailToken({
+      const user = await this.userService.getByIdWithForgotPasswordToken({
         id: payload.userId
       })
-
       const reqToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request)
       const dbToken = user.Tokens[0].token
 

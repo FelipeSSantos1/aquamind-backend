@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards
 } from '@nestjs/common'
+import { Throttle } from '@nestjs/throttler'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 import { JwtVerifyEmailGuard } from 'src/auth/jwtVerifyEmail.guard'
 import ReqWithUser from 'src/auth/reqWithUser.interface'
@@ -79,6 +80,7 @@ export class UserController {
   }
 
   @Post('sendVerifyEmail')
+  @Throttle(2, 60)
   async sendVerifyEmail(@Body() { email }: SendVerifyEmail) {
     return this.userService.sendVerifyEmail(email)
   }

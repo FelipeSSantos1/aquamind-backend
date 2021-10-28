@@ -14,6 +14,7 @@ import { LocalAuthGuard } from './localAuth.guard'
 import { JwtRefreshTokenGuard } from './jwtRefreshToken.guard'
 import { JwtAuthGuard } from './jwtAuth.guard'
 import { ForgotPasswordDto } from './dto/auth.dto'
+import { Throttle } from '@nestjs/throttler'
 
 @Controller('auth')
 export class AuthController {
@@ -49,6 +50,7 @@ export class AuthController {
   }
 
   @Post('forgotPassword')
+  @Throttle(2, 60)
   async forgotPassword(@Body() body: ForgotPasswordDto) {
     return this.authService.forgotPassword(body)
   }

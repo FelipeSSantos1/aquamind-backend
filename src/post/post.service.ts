@@ -137,6 +137,102 @@ export class PostService {
     }
   }
 
+  async findAllOnlyFollowingPaginated(user: User, take = 10, cursor = 0) {
+    try {
+      const following = await this.prismaService.follower.findMany({
+        where: {
+          idFollower: user.profileId
+        },
+        select: {
+          idFollowing: true
+        }
+      })
+      const followingIds = _.map(following, (follower) => follower.idFollowing)
+
+      if (!cursor) {
+        const firstQuery = await this.prismaService.post.findMany({
+          take,
+          where: {
+            profileId: {
+              in: followingIds
+            }
+          },
+          include: {
+            Photos: {
+              select: {
+                id: true,
+                url: true
+              }
+            },
+            Profile: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                avatar: true,
+                country: true
+              }
+            },
+            _count: {
+              select: {
+                Comment: true,
+                LikePost: true
+              }
+            }
+          },
+          orderBy: {
+            id: 'desc'
+          }
+        })
+
+        return firstQuery
+      } else {
+        const nextQuery = await this.prismaService.post.findMany({
+          take,
+          skip: 1,
+          cursor: {
+            id: cursor
+          },
+          where: {
+            profileId: {
+              in: followingIds
+            }
+          },
+          include: {
+            Photos: {
+              select: {
+                id: true,
+                url: true
+              }
+            },
+            Profile: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                avatar: true,
+                country: true
+              }
+            },
+            _count: {
+              select: {
+                Comment: true,
+                LikePost: true
+              }
+            }
+          },
+          orderBy: {
+            id: 'desc'
+          }
+        })
+
+        return nextQuery
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong')
+    }
+  }
+
   async findOne(id: number) {
     try {
       return await this.prismaService.post.findFirst({

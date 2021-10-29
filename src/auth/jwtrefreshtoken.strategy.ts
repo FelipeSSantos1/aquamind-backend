@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
-import { Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Request } from 'express'
 import moment from 'moment'
@@ -42,7 +42,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
 
       return null
     } catch (error) {
-      return null
+      throw new ForbiddenException()
     }
   }
 }

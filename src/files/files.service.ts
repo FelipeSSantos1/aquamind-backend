@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { S3 } from 'aws-sdk'
 import { ConfigService } from '@nestjs/config'
-import _ from 'lodash'
 import { v4 as uuid } from 'uuid'
 
+import { Photo } from '../post/dto/post.dto'
 import { SpaceConfig } from 'src/config/digitalOcean'
 
 @Injectable()
@@ -57,32 +57,37 @@ export class FilesService {
     }
   }
 
-  async uploadPostPhotos(img: string[], profileId: number) {
+  async uploadPostPhotos(photos: Photo[], profileId: number) {
     try {
       const s3 = new S3({ ...SpaceConfig() })
 
-      const dataBuffer = _.map(img, (image) =>
-        Buffer.from(image.replace(/^data:image\/\w+;base64,/, ''), 'base64')
-      )
-
-      const uploadResult: string[] = []
-      for (const image of dataBuffer) {
+      const uploadResult: Photo[] = []
+      for (const photo of photos) {
+        const img = Buffer.from(
+          photo.image.replace(/^data:image\/\w+;base64,/, ''),
+          'base64'
+        )
         const result = await s3
           .upload({
             Bucket: this.configService.get('DO_SPACES_NAME'),
             ACL: 'public-read',
             ContentEncoding: 'base64',
             ContentType: 'image/jpeg',
-            Body: image,
+            Body: img,
             Key: `post/${profileId}/${uuid()}.jpg`
           })
           .promise()
 
-        uploadResult.push(result.Key)
+        uploadResult.push({
+          image: result.Key,
+          width: photo.width,
+          height: photo.height
+        })
       }
 
       return uploadResult
     } catch (error) {
+      console.log({ error })
       throw new InternalServerErrorException('Something went wrong')
     }
   }

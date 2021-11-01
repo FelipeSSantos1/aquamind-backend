@@ -21,13 +21,14 @@ export class PostService {
   ) {}
 
   async create(post: CreatePostDto, user: User) {
+    console.log('here')
     const fileNames = await this.filesService.uploadPostPhotos(
       post.photos,
       user.profileId
     )
 
-    const imagePaths = _.map(fileNames, (url) => {
-      return { url }
+    const uploadedImages = _.map(fileNames, (file) => {
+      return { url: file.image, width: file.width, height: file.height }
     })
 
     try {
@@ -38,7 +39,7 @@ export class PostService {
           tankId: post.tankId,
           Photos: {
             createMany: {
-              data: imagePaths
+              data: uploadedImages
             }
           }
         },
@@ -49,6 +50,7 @@ export class PostService {
 
       return result
     } catch (error) {
+      console.log({ error })
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')
       }
@@ -70,7 +72,9 @@ export class PostService {
             Photos: {
               select: {
                 id: true,
-                url: true
+                url: true,
+                width: true,
+                height: true
               }
             },
             Profile: {
@@ -80,6 +84,15 @@ export class PostService {
                 username: true,
                 avatar: true,
                 country: true
+              }
+            },
+            Tank: {
+              select: {
+                id: true,
+                location: true,
+                length: true,
+                width: true,
+                height: true
               }
             },
             _count: {
@@ -106,7 +119,9 @@ export class PostService {
             Photos: {
               select: {
                 id: true,
-                url: true
+                url: true,
+                width: true,
+                height: true
               }
             },
             Profile: {
@@ -116,6 +131,15 @@ export class PostService {
                 username: true,
                 avatar: true,
                 country: true
+              }
+            },
+            Tank: {
+              select: {
+                id: true,
+                location: true,
+                length: true,
+                width: true,
+                height: true
               }
             },
             _count: {
@@ -161,7 +185,9 @@ export class PostService {
             Photos: {
               select: {
                 id: true,
-                url: true
+                url: true,
+                width: true,
+                height: true
               }
             },
             Profile: {
@@ -171,6 +197,15 @@ export class PostService {
                 username: true,
                 avatar: true,
                 country: true
+              }
+            },
+            Tank: {
+              select: {
+                id: true,
+                location: true,
+                length: true,
+                width: true,
+                height: true
               }
             },
             _count: {
@@ -202,7 +237,9 @@ export class PostService {
             Photos: {
               select: {
                 id: true,
-                url: true
+                url: true,
+                width: true,
+                height: true
               }
             },
             Profile: {
@@ -212,6 +249,15 @@ export class PostService {
                 username: true,
                 avatar: true,
                 country: true
+              }
+            },
+            Tank: {
+              select: {
+                id: true,
+                location: true,
+                length: true,
+                width: true,
+                height: true
               }
             },
             _count: {
@@ -251,7 +297,9 @@ export class PostService {
           Photos: {
             select: {
               id: true,
-              url: true
+              url: true,
+              width: true,
+              height: true
             }
           },
           Tank: {

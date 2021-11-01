@@ -1,16 +1,29 @@
+import { Type } from 'class-transformer'
 import {
   IsString,
   IsNumberString,
-  IsArray,
   IsOptional,
   IsBase64,
-  IsNumber
+  IsNumber,
+  ValidateNested,
+  ArrayMinSize
 } from 'class-validator'
 
+export class Photo {
+  @IsBase64()
+  image: string
+
+  @IsNumber()
+  width: number
+
+  @IsNumber()
+  height: number
+}
 export class CreatePostDto {
-  @IsArray()
-  @IsBase64({ each: true })
-  photos: string[]
+  @ValidateNested({ each: true })
+  @Type(() => Photo)
+  @ArrayMinSize(1)
+  photos: Photo[]
 
   @IsString()
   @IsOptional()

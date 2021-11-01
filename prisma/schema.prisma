@@ -238,6 +238,8 @@ model File {
   updatedAt    DateTime    @updatedAt
   type         FileType    @default(PHOTO)
   title        String?
+  height       Float?
+  width        Float?
   url          String
   // Relation & index --------------
   Post         Post?       @relation(fields: [postId], references: [id], onDelete: Cascade)

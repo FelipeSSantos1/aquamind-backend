@@ -22,7 +22,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
       return user
     } catch (error) {
-      console.log(error)
       if (error instanceof ForbiddenException) throw error
 
       throw new ForbiddenException('Something went wrong')

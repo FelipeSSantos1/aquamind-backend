@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
-import { Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 import { Request } from 'express'
 import { ConfigService } from '@nestjs/config'
 
@@ -36,7 +36,7 @@ export class JwtVerifyEmailStrategy extends PassportStrategy(
 
       return user
     } catch (error) {
-      return null
+      throw new ForbiddenException()
     }
   }
 }

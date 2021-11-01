@@ -19,10 +19,6 @@ export class ForgotPasswordDto {
 
   @IsString()
   @IsNotEmpty()
-  location: string
-
-  @IsString()
-  @IsNotEmpty()
   device: string
 }
 

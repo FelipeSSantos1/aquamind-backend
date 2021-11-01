@@ -2,6 +2,7 @@ import { Strategy } from 'passport-local'
 import { PassportStrategy } from '@nestjs/passport'
 import { ForbiddenException, Injectable } from '@nestjs/common'
 import { AuthService } from './auth.service'
+import { Profile, User } from '.prisma/client'
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -12,12 +13,19 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(email: string, password: string) {
-    const user = await this.authService.getAuthenticatedUser(email, password)
+    try {
+      const user = await this.authService.getAuthenticatedUser(email, password)
 
-    if (!user) throw new ForbiddenException('Wrong credentials provided')
-    if (!user.active) throw new ForbiddenException('Account not active')
-    if (!user.emailVerified) throw new ForbiddenException('Email not verified')
+      if (!user.active) throw new ForbiddenException('Account not active')
+      if (!user.emailVerified)
+        throw new ForbiddenException('Email not verified')
 
-    return user
+      return user
+    } catch (error) {
+      console.log(error)
+      if (error instanceof ForbiddenException) throw error
+
+      throw new ForbiddenException('Something went wrong')
+    }
   }
 }

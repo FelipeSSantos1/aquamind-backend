@@ -37,7 +37,7 @@ export class AuthService {
       user.password = undefined
       return user
     } catch (error) {
-      throw new ForbiddenException('Something went wrong')
+      throw new ForbiddenException('Wrong credentials')
     }
   }
 

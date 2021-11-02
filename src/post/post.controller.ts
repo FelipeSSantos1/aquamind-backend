@@ -49,8 +49,15 @@ export class PostController {
   @Get('paginate/:take/:cursor')
   @Throttle(30, 60)
   @UseGuards(JwtAuthGuard)
-  findAllPaginated(@Param() { take, cursor }: GetAllPaginationParam) {
-    return this.postService.findAllPaginated(Number(take), Number(cursor))
+  findAllPaginated(
+    @Param() { take, cursor }: GetAllPaginationParam,
+    @Req() req: ReqWithUser
+  ) {
+    return this.postService.findAllPaginated(
+      Number(take),
+      Number(cursor),
+      req.user
+    )
   }
 
   @Get('onlyFollowing/paginate/:take/:cursor')

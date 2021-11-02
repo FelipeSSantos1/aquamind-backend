@@ -21,7 +21,6 @@ export class PostService {
   ) {}
 
   async create(post: CreatePostDto, user: User) {
-    console.log('here')
     const fileNames = await this.filesService.uploadPostPhotos(
       post.photos,
       user.profileId
@@ -50,7 +49,6 @@ export class PostService {
 
       return result
     } catch (error) {
-      console.log({ error })
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')
       }
@@ -63,7 +61,7 @@ export class PostService {
     }
   }
 
-  async findAllPaginated(take = 10, cursor = 0) {
+  async findAllPaginated(take = 10, cursor = 0, user: User) {
     try {
       if (!cursor) {
         const firstQuery = await this.prismaService.post.findMany({
@@ -93,6 +91,16 @@ export class PostService {
                 length: true,
                 width: true,
                 height: true
+              }
+            },
+            LikePost: {
+              take: 1,
+              select: {
+                postId: true,
+                profileId: true
+              },
+              where: {
+                profileId: user.profileId
               }
             },
             _count: {
@@ -140,6 +148,16 @@ export class PostService {
                 length: true,
                 width: true,
                 height: true
+              }
+            },
+            LikePost: {
+              take: 1,
+              select: {
+                postId: true,
+                profileId: true
+              },
+              where: {
+                profileId: user.profileId
               }
             },
             _count: {
@@ -208,6 +226,16 @@ export class PostService {
                 height: true
               }
             },
+            LikePost: {
+              take: 1,
+              select: {
+                postId: true,
+                profileId: true
+              },
+              where: {
+                profileId: user.profileId
+              }
+            },
             _count: {
               select: {
                 Comment: true,
@@ -258,6 +286,16 @@ export class PostService {
                 length: true,
                 width: true,
                 height: true
+              }
+            },
+            LikePost: {
+              take: 1,
+              select: {
+                postId: true,
+                profileId: true
+              },
+              where: {
+                profileId: user.profileId
               }
             },
             _count: {

@@ -87,7 +87,6 @@ export class FilesService {
 
       return uploadResult
     } catch (error) {
-      console.log({ error })
       throw new InternalServerErrorException('Something went wrong')
     }
   }

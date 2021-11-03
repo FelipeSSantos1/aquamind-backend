@@ -1,5 +1,7 @@
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import express from 'express'
+// import * as bodyParser from 'body-parser'
 import helmet from 'helmet'
 
 import { AppModule } from './app.module'
@@ -18,6 +20,7 @@ async function bootstrap() {
       xssFilter: false
     })
   )
+  app.use(express.json({ limit: '50mb' }))
   app.enableCors({
     origin: ['http://aquamind.app', 'https://aquamind.app'],
     methods: ['PATCH', 'POST']

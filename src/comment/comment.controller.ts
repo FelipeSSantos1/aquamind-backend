@@ -27,9 +27,10 @@ export class CommentController {
   }
 
   @Get(':id')
+  @Throttle(30, 60)
   @UseGuards(JwtAuthGuard)
-  findAllByPost(@Param() { id }: FindOneParam) {
-    return this.commentService.findAllByPost(Number(id))
+  findAllByPost(@Param() { id }: FindOneParam, @Req() req: ReqWithUser) {
+    return this.commentService.findAllByPost(Number(id), req.user)
   }
 
   @Delete(':id')

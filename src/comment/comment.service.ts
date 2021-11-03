@@ -37,7 +37,7 @@ export class CommentService {
     }
   }
 
-  async findAllByPost(postId: number) {
+  async findAllByPost(postId: number, user: User) {
     try {
       const result = await this.prismaService.comment.findMany({
         where: {
@@ -52,6 +52,16 @@ export class CommentService {
                   name: true,
                   username: true,
                   avatar: true
+                }
+              },
+              LikeComment: {
+                take: 1,
+                select: {
+                  commentId: true,
+                  profileId: true
+                },
+                where: {
+                  profileId: user.profileId
                 }
               },
               _count: {
@@ -70,6 +80,16 @@ export class CommentService {
               name: true,
               username: true,
               avatar: true
+            }
+          },
+          LikeComment: {
+            take: 1,
+            select: {
+              commentId: true,
+              profileId: true
+            },
+            where: {
+              profileId: user.profileId
             }
           },
           _count: {

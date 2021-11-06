@@ -5,8 +5,7 @@ async function main() {
   const Bob = await prisma.user.create({
     data: {
       email: 'bob@gmail.com',
-      password:
-        '13c104616afaa83ed005d692a08c0baf23fb74a76e221a7a77758cc0aa7e0bea',
+      password: '1234567',
       active: true,
       emailVerified: true,
       role: 'USER',
@@ -26,8 +25,7 @@ async function main() {
   const Felipe = await prisma.user.create({
     data: {
       email: 'felipemillhouse@gmail.com',
-      password:
-        '13c104616afaa83ed005d692a08c0baf23fb74a76e221a7a77758cc0aa7e0bea',
+      password: '1234567',
       active: true,
       emailVerified: true,
       role: 'ADMIN',

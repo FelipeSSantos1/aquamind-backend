@@ -348,7 +348,7 @@ export class PostService {
               dayLight: true,
               description: true,
               filter: true,
-              gravel: true,
+              substrate: true,
               height: true,
               length: true,
               light: true,

@@ -50,7 +50,7 @@ export class CreateTankDto {
 
   @IsOptional()
   @IsString()
-  gravel?: string
+  substrate?: string
 
   @IsNumber()
   @Min(0.5)
@@ -96,6 +96,7 @@ export class CreateTankDto {
   @Type(() => Fertilizer)
   ferts?: {
     fertilizerId: number
+    amount: number
   }[]
 }
 
@@ -133,7 +134,7 @@ export class UpdateTankDto {
 
   @IsOptional()
   @IsString()
-  gravel?: string
+  substrate?: string
 
   @IsNumber()
   @Min(0.5)

@@ -134,7 +134,7 @@ model Tank {
   width          Float
   height         Float
   light          String?
-  gravel         String?
+  substrate      String?
   co2            Int?
   dayLight       Float?
   filter         String?

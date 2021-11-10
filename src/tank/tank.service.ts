@@ -36,7 +36,7 @@ export class TankService {
           dayLight: tank.dayLight,
           description: tank.description,
           filter: tank.filter,
-          gravel: tank.gravel,
+          substrate: tank.substrate,
           light: tank.light,
           public: tank.public,
           location: tank.location,

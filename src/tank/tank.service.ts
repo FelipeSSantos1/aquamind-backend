@@ -20,10 +20,9 @@ export class TankService {
   ) {}
 
   async create(tank: CreateTankDto, user: User) {
-    const uploadedFile = await this.filesService.uploadTankAvatar(
-      tank.avatar,
-      user.profileId
-    )
+    const uploadedFile = !!tank.avatar
+      ? await this.filesService.uploadTankAvatar(tank.avatar, user.profileId)
+      : null
     try {
       const result = await this.prismaService.tank.create({
         data: {
@@ -40,7 +39,7 @@ export class TankService {
           light: tank.light,
           public: tank.public,
           location: tank.location,
-          avatar: uploadedFile.Key,
+          avatar: !!uploadedFile ? uploadedFile.Key : '',
           profileId: user.profileId,
           TankPlant: {
             createMany: {
@@ -304,17 +303,16 @@ export class TankService {
         throw new ForbiddenException()
       }
 
-      const uploadedFile = await this.filesService.uploadTankAvatar(
-        photo.avatar,
-        user.profileId
-      )
+      const uploadedFile = !!photo.avatar
+        ? await this.filesService.uploadTankAvatar(photo.avatar, user.profileId)
+        : null
 
       const result = await this.prismaService.tank.update({
         where: {
           id
         },
         data: {
-          avatar: uploadedFile.Key
+          avatar: !!uploadedFile ? uploadedFile.Key : ''
         },
         include: {
           TankFertilizer: {

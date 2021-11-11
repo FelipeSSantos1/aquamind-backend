@@ -53,7 +53,6 @@ export class CreateTankDto {
   substrate?: string
 
   @IsNumber()
-  @Min(0.5)
   @IsOptional()
   co2?: number
 
@@ -137,7 +136,6 @@ export class UpdateTankDto {
   substrate?: string
 
   @IsNumber()
-  @Min(0.5)
   @IsOptional()
   co2?: number
 

@@ -15,8 +15,16 @@ import moment from 'moment'
 import { PrismaError } from 'src/utils/prismaError'
 import { MailService } from 'src/mail/mail.service'
 import { PrismaService } from 'src/prisma.service'
-import { AddUserDto, GetByEmailDto, UserIdDto, FollowDto } from './dto/user.dto'
+import {
+  AddUserDto,
+  GetByEmailDto,
+  UserIdDto,
+  FollowDto,
+  UpdatePhotoDto,
+  UpdateProfileDto
+} from './dto/user.dto'
 import { createHash } from 'src/utils/crypt'
+import { FilesService } from 'src/files/files.service'
 
 @Injectable()
 export class UserService {
@@ -24,7 +32,8 @@ export class UserService {
     private readonly prismaService: PrismaService,
     private readonly mailService: MailService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly filesService: FilesService
   ) {}
 
   getAll() {
@@ -138,6 +147,21 @@ export class UserService {
         Profile: true
       }
     })
+
+    return result
+  }
+
+  async getProfile(user: User) {
+    const result = await this.prismaService.profile.findUnique({
+      where: {
+        id: user.profileId
+      },
+      include: {
+        User: true,
+        _count: true
+      }
+    })
+    result.User.password = undefined
 
     return result
   }
@@ -399,6 +423,76 @@ export class UserService {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaError.RecordDoesNotExist) {
           throw new NotFoundException('User does not exist')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
+  }
+
+  async updatePhoto(photo: UpdatePhotoDto, user: User) {
+    try {
+      const uploadedFile = !!photo.avatar
+        ? await this.filesService.uploadProfileAvatar(
+            photo.avatar,
+            user.profileId
+          )
+        : null
+
+      const result = await this.prismaService.profile.update({
+        where: {
+          id: user.profileId
+        },
+        data: {
+          avatar: !!uploadedFile ? uploadedFile.Key : ''
+        }
+      })
+
+      if (!result) throw new NotFoundException()
+      return result
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Profile not found')
+      }
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Profile not found')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
+  }
+
+  async updateProfile(body: UpdateProfileDto, user: User) {
+    try {
+      const result = await this.prismaService.profile.update({
+        where: {
+          id: user.profileId
+        },
+        data: {
+          ...body
+        },
+        include: {
+          User: true,
+          _count: true
+        }
+      })
+
+      if (!result) throw new NotFoundException()
+
+      return result
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Profile not found')
+      }
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Profile not found')
         }
       }
       throw new InternalServerErrorException('Something went wrong')

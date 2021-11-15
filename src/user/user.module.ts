@@ -6,9 +6,10 @@ import { UserController } from './user.controller'
 import { UserService } from './user.service'
 import { PrismaService } from '../prisma.service'
 import { MailService } from '../mail/mail.service'
+import { FilesModule } from 'src/files/files.module'
 
 @Module({
-  imports: [ConfigModule, JwtModule.register({})],
+  imports: [ConfigModule, JwtModule.register({}), FilesModule],
   controllers: [UserController],
   providers: [UserService, PrismaService, MailService],
   exports: [UserService]

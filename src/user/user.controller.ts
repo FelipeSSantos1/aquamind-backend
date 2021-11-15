@@ -18,7 +18,9 @@ import {
   GetByEmailDto,
   UserIdDto,
   FollowDto,
-  SendVerifyEmail
+  SendVerifyEmail,
+  UpdatePhotoDto,
+  UpdateProfileDto
 } from './dto/user.dto'
 import { UserService } from './user.service'
 
@@ -44,44 +46,62 @@ export class UserController {
     return this.userService.getByEmail({ email })
   }
 
+  @Get('profile/profile')
+  @UseGuards(JwtAuthGuard)
+  getProfile(@Req() req: ReqWithUser) {
+    return this.userService.getProfile(req.user)
+  }
+
   @Post()
-  async createUser(@Body() body: AddUserDto) {
+  createUser(@Body() body: AddUserDto) {
     return this.userService.createUser(body)
   }
 
   @Post('follow')
   @UseGuards(JwtAuthGuard)
-  async follow(@Body() body: FollowDto, @Req() req: ReqWithUser) {
+  follow(@Body() body: FollowDto, @Req() req: ReqWithUser) {
     return this.userService.follow(body, req.user)
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  async deleteUser(@Param() { id }: UserIdDto, @Req() req: ReqWithUser) {
+  deleteUser(@Param() { id }: UserIdDto, @Req() req: ReqWithUser) {
     return this.userService.deleteUser({ id }, req.user)
   }
 
   @Patch('deactivate')
   @UseGuards(JwtAuthGuard)
-  async deactiveUser(@Body() body: UserIdDto, @Req() req: ReqWithUser) {
+  deactiveUser(@Body() body: UserIdDto, @Req() req: ReqWithUser) {
     return this.userService.deactiveUser(body, req.user)
   }
 
   @Patch('activate')
   @UseGuards(JwtAuthGuard)
-  async activeUser(@Body() body: UserIdDto, @Req() req: ReqWithUser) {
+  activeUser(@Body() body: UserIdDto, @Req() req: ReqWithUser) {
     return this.userService.activeUser(body, req.user)
   }
 
   @Patch('verifyEmail')
   @UseGuards(JwtVerifyEmailGuard)
-  async verifyEmail(@Req() req: ReqWithUser) {
+  verifyEmail(@Req() req: ReqWithUser) {
     return this.userService.verifyEmail(req.user)
   }
 
   @Post('sendVerifyEmail')
   @Throttle(2, 60)
-  async sendVerifyEmail(@Body() { email }: SendVerifyEmail) {
+  sendVerifyEmail(@Body() { email }: SendVerifyEmail) {
     return this.userService.sendVerifyEmail(email)
+  }
+
+  @Patch('updatePhoto')
+  @UseGuards(JwtAuthGuard)
+  updatePhoto(@Body() photo: UpdatePhotoDto, @Req() req: ReqWithUser) {
+    return this.userService.updatePhoto(photo, req.user)
+  }
+
+  @Patch('updateProfile')
+  @UseGuards(JwtAuthGuard)
+  updateProfile(@Body() body: UpdateProfileDto, @Req() req: ReqWithUser) {
+    return this.userService.updateProfile(body, req.user)
   }
 }

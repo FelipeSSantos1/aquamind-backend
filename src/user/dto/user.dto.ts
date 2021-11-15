@@ -4,7 +4,9 @@ import {
   IsNotEmpty,
   MinLength,
   IsUUID,
-  IsNumber
+  IsNumber,
+  IsBase64,
+  IsOptional
 } from 'class-validator'
 
 export class AddUserDto {
@@ -36,4 +38,25 @@ export class FollowDto {
 export class SendVerifyEmail {
   @IsEmail()
   email: string
+}
+export class UpdatePhotoDto {
+  @IsBase64()
+  avatar: string
+}
+export class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  name: string
+
+  @IsString()
+  @IsNotEmpty()
+  username: string
+
+  @IsOptional()
+  @IsString()
+  country: string
+
+  @IsOptional()
+  @IsString()
+  bio: string
 }

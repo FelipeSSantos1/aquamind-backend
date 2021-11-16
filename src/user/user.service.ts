@@ -21,7 +21,8 @@ import {
   UserIdDto,
   FollowDto,
   UpdatePhotoDto,
-  UpdateProfileDto
+  UpdateProfileDto,
+  UpdatePNTokenDto
 } from './dto/user.dto'
 import { createHash } from 'src/utils/crypt'
 import { FilesService } from 'src/files/files.service'
@@ -493,6 +494,37 @@ export class UserService {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaError.RecordDoesNotExist) {
           throw new NotFoundException('Profile not found')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
+  }
+
+  async updatePNToken(body: UpdatePNTokenDto, user: User) {
+    try {
+      const result = await this.prismaService.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          pnToken: body.token
+        }
+      })
+
+      if (!result) throw new NotFoundException()
+
+      result.password = undefined
+      return result
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('User not found')
+      }
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('User not found')
         }
       }
       throw new InternalServerErrorException('Something went wrong')

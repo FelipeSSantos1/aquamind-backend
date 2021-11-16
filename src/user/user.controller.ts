@@ -20,7 +20,8 @@ import {
   FollowDto,
   SendVerifyEmail,
   UpdatePhotoDto,
-  UpdateProfileDto
+  UpdateProfileDto,
+  UpdatePNTokenDto
 } from './dto/user.dto'
 import { UserService } from './user.service'
 
@@ -103,5 +104,11 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   updateProfile(@Body() body: UpdateProfileDto, @Req() req: ReqWithUser) {
     return this.userService.updateProfile(body, req.user)
+  }
+
+  @Patch('updatePNToken')
+  @UseGuards(JwtAuthGuard)
+  updatePNTonek(@Body() body: UpdatePNTokenDto, @Req() req: ReqWithUser) {
+    return this.userService.updatePNToken(body, req.user)
   }
 }

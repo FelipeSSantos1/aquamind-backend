@@ -60,3 +60,9 @@ export class UpdateProfileDto {
   @IsString()
   bio: string
 }
+
+export class UpdatePNTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  token: string
+}

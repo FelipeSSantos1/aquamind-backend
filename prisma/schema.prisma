@@ -102,6 +102,7 @@ model Fertilizer {
   name           String           @unique
   description    String?
   unit           String
+  testMethod     String           @default("")
   avatar         String?
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt

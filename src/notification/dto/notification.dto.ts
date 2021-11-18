@@ -11,11 +11,11 @@ export class SendNotificationDto {
   body: string
 
   @IsOptional()
-  @IsObject()
+  @IsNumber()
   postId?: number
 
   @IsOptional()
-  @IsObject()
+  @IsNumber()
   commentId?: number
 
   @IsOptional()

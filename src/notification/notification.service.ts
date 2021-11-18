@@ -6,11 +6,12 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Expo, ExpoPushMessage } from 'expo-server-sdk'
-import { User } from '@prisma/client'
+import { Prisma, User } from '@prisma/client'
 
 import { PrismaService } from 'src/prisma.service'
 import { UserService } from 'src/user/user.service'
 import { SendNotificationDto } from './dto/notification.dto'
+import { PrismaError } from 'src/utils/prismaError'
 
 @Injectable()
 export class NotificationService {
@@ -61,8 +62,11 @@ export class NotificationService {
         }
       })
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException('User to send not found')
+      console.log(error)
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.ForeignKeyConstraint) {
+          throw new NotFoundException('ForeignKeyConstraint')
+        }
       }
       if (error instanceof BadRequestException) {
         throw new BadRequestException(

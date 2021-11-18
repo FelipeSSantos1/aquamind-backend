@@ -21,11 +21,11 @@ export class NotificationService {
   ) {}
 
   async sendNotification(
-    { profileId, title, body, data }: SendNotificationDto,
+    { to, title, body, commentId, postId, data }: SendNotificationDto,
     user: User
   ) {
     try {
-      const toProfileResponse = await this.userService.getByProfileId(profileId)
+      const toProfileResponse = await this.userService.getByProfileId(to)
       const { pnToken } = toProfileResponse.User
 
       if (!Expo.isExpoPushToken(pnToken)) {
@@ -52,6 +52,8 @@ export class NotificationService {
           message: body,
           fromProfileId: user.profileId,
           toProfileId: toProfileResponse.id,
+          postId,
+          commentId,
           expoId:
             notificationResponse[0].status === 'ok'
               ? notificationResponse[0].id

@@ -193,6 +193,7 @@ model Post {
   tankId      Int?
   Profile     Profile?   @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId   Int?
+  Message     Message[]
 }
 
 model LikePost {
@@ -221,6 +222,7 @@ model Comment {
   Profile     Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId   Int
   LikeComment LikeComment[]
+  Message     Message[]
 }
 
 model LikeComment {
@@ -266,6 +268,10 @@ model Message {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   // Relation & index --------------
+  CommentId     Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId     Int?
+  PostId        Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId        Int?
   To            Profile? @relation(fields: [toProfileId], references: [id], onDelete: Cascade, name: "ToProfile")
   toProfileId   Int?
   From          Profile? @relation(fields: [fromProfileId], references: [id], onDelete: Cascade, name: "FromProfile")

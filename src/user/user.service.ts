@@ -70,6 +70,24 @@ export class UserService {
     }
   }
 
+  async getByPNToken(token: string) {
+    try {
+      const result = await this.prismaService.user.findUnique({
+        where: {
+          pnToken: token
+        },
+        include: {
+          Profile: true
+        }
+      })
+
+      result.password = undefined
+      return result
+    } catch (error) {
+      throw new BadRequestException()
+    }
+  }
+
   async getByIdWithEmailToken({ id }: UserIdDto) {
     try {
       const result = await this.prismaService.user.findUnique({
@@ -165,6 +183,30 @@ export class UserService {
     result.User.password = undefined
 
     return result
+  }
+
+  async getByProfileId(profileId: number) {
+    try {
+      const result = await this.prismaService.profile.findUnique({
+        where: {
+          id: profileId
+        },
+        include: {
+          User: true,
+          _count: true
+        }
+      })
+      if (!result) {
+        throw new NotFoundException()
+      }
+      result.User.password = undefined
+
+      return result
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('User to send not found')
+      }
+    }
   }
 
   async createUser({ email, password }: AddUserDto) {

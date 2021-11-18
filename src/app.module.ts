@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import Joi from '@hapi/joi'
 
+import { NotificationModule } from './notification/notification.module'
 import { MailModule } from './mail/mail.module'
 import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
@@ -24,6 +25,7 @@ import { APP_GUARD } from '@nestjs/core'
       validationSchema: Joi.object({
         RESET_PASSWORD_ENDPOINT: Joi.string().required(),
         JWT_FORGOT_PASSWORD_TOKEN: Joi.string().required(),
+        EXPO_PUSH_NOTIFICATION: Joi.string().required(),
         JWT_FORGOT_PASSWORD_EXPIRATION_TIME: Joi.string().required(),
         JWT_VERIFY_EMAIL_TOKEN: Joi.string().required(),
         JWT_VERIFY_EMAIL_EXPIRATION_TIME: Joi.string().required(),
@@ -50,6 +52,7 @@ import { APP_GUARD } from '@nestjs/core'
     PostModule,
     TankModule,
     FilesModule,
+    NotificationModule,
     CommentModule
   ],
   providers: [

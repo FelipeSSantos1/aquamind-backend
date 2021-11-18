@@ -76,8 +76,8 @@ export class PostController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  findOne(@Param() { id }: FindOneParam) {
-    return this.postService.findOne(Number(id))
+  findOne(@Param() { id }: FindOneParam, @Req() req: ReqWithUser) {
+    return this.postService.findOne(Number(id), req.user)
   }
 
   @Patch(':id')

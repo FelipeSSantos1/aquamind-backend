@@ -317,13 +317,70 @@ export class PostService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, user: User) {
     try {
-      return await this.prismaService.post.findFirst({
+      const response = await this.prismaService.post.findFirst({
         where: {
           id
         },
         include: {
+          Comment: {
+            include: {
+              Comment: {
+                include: {
+                  Profile: {
+                    select: {
+                      id: true,
+                      name: true,
+                      username: true,
+                      avatar: true
+                    }
+                  },
+                  LikeComment: {
+                    take: 1,
+                    select: {
+                      commentId: true,
+                      profileId: true
+                    },
+                    where: {
+                      profileId: user.profileId
+                    }
+                  },
+                  _count: {
+                    select: {
+                      LikeComment: true
+                    }
+                  }
+                }
+              },
+              Profile: {
+                select: {
+                  id: true,
+                  name: true,
+                  username: true,
+                  avatar: true
+                }
+              },
+              LikeComment: {
+                take: 1,
+                select: {
+                  commentId: true,
+                  profileId: true
+                },
+                where: {
+                  profileId: user.profileId
+                }
+              },
+              _count: {
+                select: {
+                  LikeComment: true
+                }
+              }
+            },
+            orderBy: {
+              createdAt: 'asc'
+            }
+          },
           Profile: {
             select: {
               id: true,
@@ -389,9 +446,29 @@ export class PostService {
                 }
               }
             }
+          },
+          _count: {
+            select: {
+              LikePost: true,
+              Comment: true
+            }
           }
         }
       })
+
+      const { Comment } = response
+
+      for (const comment of Comment) {
+        for (const childComment of comment.Comment) {
+          _.remove(Comment, { id: childComment.id })
+        }
+      }
+      response.Comment = _.sortBy(
+        Comment,
+        (comment) => -comment._count.LikeComment
+      )
+
+      return response
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong')
     }
@@ -399,7 +476,7 @@ export class PostService {
 
   async update(id: number, post: UpdatePostDto, user: User) {
     try {
-      const postResponse = await this.findOne(id)
+      const postResponse = await this.findOne(id, user)
 
       if (
         postResponse &&
@@ -444,7 +521,7 @@ export class PostService {
 
   async remove(id: number, user: User) {
     try {
-      const post = await this.findOne(id)
+      const post = await this.findOne(id, user)
 
       if (
         post &&

@@ -5,7 +5,8 @@ async function main() {
   const Bob = await prisma.user.create({
     data: {
       email: 'bob@gmail.com',
-      password: '1234567',
+      password:
+        '8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414',
       active: true,
       emailVerified: true,
       role: 'USER',
@@ -15,8 +16,7 @@ async function main() {
           username: 'Bob_Robert',
           country: 'Canada',
           bio: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-          avatar:
-            'https://media.distractify.com/brand-img/payNR5Jfb/0x0/is-korra-the-last-avatar-1595380417772.png'
+          avatar: 'avatar/profile/2/6970e881-15f4-4682-ba86-562def8eaa1d.jpg'
         }
       }
     }
@@ -25,7 +25,8 @@ async function main() {
   const Felipe = await prisma.user.create({
     data: {
       email: 'felipemillhouse@gmail.com',
-      password: '1234567',
+      password:
+        '8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414',
       active: true,
       emailVerified: true,
       role: 'ADMIN',
@@ -35,8 +36,7 @@ async function main() {
           username: 'felipemillhouse',
           country: 'Canada',
           bio: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-          avatar:
-            'https://media.distractify.com/brand-img/payNR5Jfb/0x0/is-korra-the-last-avatar-1595380417772.png'
+          avatar: 'avatar/profile/2/6970e881-15f4-4682-ba86-562def8eaa1d.jpg'
         }
       }
     }
@@ -53,7 +53,7 @@ async function main() {
     data: {
       name: 'Tropica',
       website: 'https://www.tropica.com/',
-      logo: 'https://tropica.com/Theme/gfx/tropica-grey-logo-2019.png'
+      logo: 'brand/tropica-grey-logo-2019.png'
     }
   })
 
@@ -62,8 +62,7 @@ async function main() {
       name: "Eleocharis sp. 'Mini'",
       description:
         "Eleocharis sp. 'Mini' only grows to a height of 3-6 cm, which makes it even smaller than Eleocharis parvula (or rather, E. pusilla). It's also labeled Eleocharis acicularis 'Mini'. If you distribute it in small tufts over the entire area to be covered it will soon form a dense, lush lawn thanks to its many runners. It needs good light, but is a great choice as ground-covering plant as it is otherwise undemanding and hardly ever needs trimming.",
-      avatar:
-        'https://www.aquasabi.com/media/image/product/3951/md/eleocharis-sp-mini-1-2-grow.jpg',
+      avatar: 'plants/eleocharisMini.jpg',
       brandId: TropicaBrand.id
     }
   })
@@ -83,8 +82,7 @@ async function main() {
       description:
         'Contains nitrogen and phosphor for fast-growing and demanding plants, also contains iron, magnesium and vital micro nutrients. Suitable for aquariums with many and fast-growing plants',
       unit: 'ml/day',
-      avatar:
-        'https://tropica.com/imagegen.ashx?width=370&image=/Plant%20Care/616/1.JPG&crop=resize&class=product',
+      avatar: 'fertilizer/tropicaSpecializedNutrition.jpg',
       brandId: TropicaBrand.id
     }
   })
@@ -94,8 +92,7 @@ async function main() {
       description:
         'Contains iron, magnesium and vital micro nutrients, does not contain nitrogen and phosphor. Suitable for aquariums with few or slow-growing plants and many fish',
       unit: 'ml/day',
-      avatar:
-        'https://tropica.com/imagegen.ashx?width=370&image=/Plant%20Care/614/1.JPG&crop=resize&class=product',
+      avatar: 'fertilizer/tropicaPremiumNutrition.jpg',
       brandId: TropicaBrand.id
     }
   })

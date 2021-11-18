@@ -9,6 +9,7 @@ import {
   UseGuards,
   Patch
 } from '@nestjs/common'
+import { Throttle } from '@nestjs/throttler'
 
 import { PostService } from './post.service'
 import {
@@ -20,7 +21,6 @@ import {
 import ReqWithUser from 'src/auth/reqWithUser.interface'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 import { FindOneParam } from 'src/utils/findOneParam'
-import { Throttle } from '@nestjs/throttler'
 
 @Controller('post')
 export class PostController {

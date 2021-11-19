@@ -49,7 +49,7 @@ export class MailService {
 
   async confirmEmail(token: string, email: string, expiresIn: string) {
     const config = new ConfigService()
-    const url = `${config.get('MAIL_CONFIRMATION_ENDPOINT')}/token=${token}`
+    const url = `${config.get('MAIL_CONFIRMATION_ENDPOINT')}/${token}`
     return await this.sendMail({
       to: email,
       subject: 'Confirm your email',
@@ -66,7 +66,7 @@ export class MailService {
     ...params
   }: forgotPasswordProps & ForgotPasswordDto) {
     const config = new ConfigService()
-    const url = `${config.get('RESET_PASSWORD_ENDPOINT')}/token=${token}`
+    const url = `${config.get('RESET_PASSWORD_ENDPOINT')}/${token}`
     return await this.sendMail({
       to: email,
       subject: 'Reset your password',

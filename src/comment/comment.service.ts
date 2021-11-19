@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -179,7 +180,7 @@ export class CommentService {
           throw new NotFoundException('Comment not found')
         }
         if (error.code === PrismaError.UniqueConstraint) {
-          throw new NotFoundException('Comment already liked')
+          throw new ConflictException('Comment already liked')
         }
       }
       throw new InternalServerErrorException('Something went wrong')

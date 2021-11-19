@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -569,7 +570,7 @@ export class PostService {
           throw new NotFoundException('Post not found')
         }
         if (error.code === PrismaError.UniqueConstraint) {
-          throw new NotFoundException('Post already liked')
+          throw new ConflictException('Post already liked')
         }
       }
       throw new InternalServerErrorException('Something went wrong')

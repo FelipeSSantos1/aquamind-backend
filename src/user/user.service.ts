@@ -537,6 +537,9 @@ export class UserService {
         if (error.code === PrismaError.RecordDoesNotExist) {
           throw new NotFoundException('Profile not found')
         }
+        if (error.code === PrismaError.UniqueConstraint) {
+          throw new ConflictException('Username already in use')
+        }
       }
       throw new InternalServerErrorException('Something went wrong')
     }

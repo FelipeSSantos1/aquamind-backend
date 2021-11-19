@@ -22,7 +22,8 @@ import {
   FollowDto,
   UpdatePhotoDto,
   UpdateProfileDto,
-  UpdatePNTokenDto
+  UpdatePNTokenDto,
+  ResetPasswordDto
 } from './dto/user.dto'
 import { createHash } from 'src/utils/crypt'
 import { FilesService } from 'src/files/files.service'
@@ -64,6 +65,7 @@ export class UserService {
       })
 
       result.password = undefined
+      result.pnToken = undefined
       return result
     } catch (error) {
       throw new BadRequestException()
@@ -82,6 +84,7 @@ export class UserService {
       })
 
       result.password = undefined
+      result.pnToken = undefined
       return result
     } catch (error) {
       throw new BadRequestException()
@@ -105,6 +108,7 @@ export class UserService {
       })
 
       result.password = undefined
+      result.pnToken = undefined
       return result
     } catch (error) {
       throw new BadRequestException()
@@ -128,6 +132,7 @@ export class UserService {
       })
 
       result.password = undefined
+      result.pnToken = undefined
       return result
     } catch (error) {
       throw new BadRequestException()
@@ -151,6 +156,7 @@ export class UserService {
       })
 
       result.password = undefined
+      result.pnToken = undefined
       return result
     } catch (error) {
       throw new BadRequestException()
@@ -334,6 +340,7 @@ export class UserService {
       })
 
       result.password = undefined
+      result.pnToken = undefined
       return result
     } catch (error) {
       if (error instanceof ForbiddenException) {
@@ -369,6 +376,7 @@ export class UserService {
       })
 
       result.password = undefined
+      result.pnToken = undefined
       return result
     } catch (error) {
       if (error instanceof ForbiddenException) {
@@ -461,6 +469,7 @@ export class UserService {
       })
 
       result.password = undefined
+      result.pnToken = undefined
       return result
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -491,6 +500,45 @@ export class UserService {
       })
 
       if (!result) throw new NotFoundException()
+      return result
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Profile not found')
+      }
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('Some of your input has a wrong value')
+      }
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordDoesNotExist) {
+          throw new NotFoundException('Profile not found')
+        }
+      }
+      throw new InternalServerErrorException('Something went wrong')
+    }
+  }
+
+  async resetPassword(body: ResetPasswordDto, user: User) {
+    try {
+      const result = await this.prismaService.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          password: createHash(body.password)
+        }
+      })
+
+      if (!result) throw new NotFoundException()
+
+      result.password = undefined
+      result.pnToken = undefined
+      await this.prismaService.token.deleteMany({
+        where: {
+          userId: user.id,
+          type: TokenType.FORGOTPASSWORD
+        }
+      })
+
       return result
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -559,6 +607,7 @@ export class UserService {
       if (!result) throw new NotFoundException()
 
       result.password = undefined
+      result.pnToken = undefined
       return result
     } catch (error) {
       if (error instanceof NotFoundException) {

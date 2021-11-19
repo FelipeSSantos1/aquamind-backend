@@ -66,3 +66,10 @@ export class UpdatePNTokenDto {
   @IsNotEmpty()
   token: string
 }
+
+export class ResetPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(7)
+  password: string
+}

@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
+import { JwtResetPasswordGuard } from 'src/auth/jwtResetPassword.guard'
 import { JwtVerifyEmailGuard } from 'src/auth/jwtVerifyEmail.guard'
 import ReqWithUser from 'src/auth/reqWithUser.interface'
 import {
@@ -21,7 +22,8 @@ import {
   SendVerifyEmail,
   UpdatePhotoDto,
   UpdateProfileDto,
-  UpdatePNTokenDto
+  UpdatePNTokenDto,
+  ResetPasswordDto
 } from './dto/user.dto'
 import { UserService } from './user.service'
 
@@ -98,6 +100,12 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   updatePhoto(@Body() photo: UpdatePhotoDto, @Req() req: ReqWithUser) {
     return this.userService.updatePhoto(photo, req.user)
+  }
+
+  @Patch('resetPassword')
+  @UseGuards(JwtResetPasswordGuard)
+  resetPassword(@Body() body: ResetPasswordDto, @Req() req: ReqWithUser) {
+    return this.userService.resetPassword(body, req.user)
   }
 
   @Patch('updateProfile')

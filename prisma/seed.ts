@@ -1,5 +1,12 @@
 import { PrismaClient } from '@prisma/client'
 import plants from './plantSeed'
+import fertilizerTropica from './fertilizer/tropica'
+import fertilizerAda from './fertilizer/ada'
+import fertilizerSeachem from './fertilizer/seachem'
+import fertilizerNilocG from './fertilizer/nilocG'
+import fertilizerGreenAqua from './fertilizer/greenAqua'
+import fertilizerCustom from './fertilizer/custom'
+import fertilizerDennerle from './fertilizer/dennerle'
 const prisma = new PrismaClient()
 
 async function main() {
@@ -7,7 +14,7 @@ async function main() {
     data: {
       email: 'apple@aquamind.app',
       password:
-        '8c454bbf296aa786d6fe4fc7c9b9f6aae370b6061a452a1cdc7ad9ac04a5c164', // 2VySWQiOiI1YmVlMWI3OS0wNz
+        '8c454bbf296aa786d6fe4fc7c9b9f6aae370b6061a452a1cdc7ad9ac04a5c164',
       active: true,
       emailVerified: true,
       role: 'USER',
@@ -42,36 +49,117 @@ async function main() {
     }
   })
 
-  const TropicaBrand = await prisma.brand.create({
+  // Fertilizer Tropica
+  await prisma.brand.create({
     data: {
       name: 'Tropica',
-      website: 'https://www.tropica.com/',
-      logo: 'brand/tropica-grey-logo-2019.png'
+      website: 'https://www.tropica.com',
+      logo: 'brand/tropica-grey-logo-2019.png',
+      Fertilizer: {
+        createMany: {
+          data: fertilizerTropica
+        }
+      }
+    }
+  })
+  // Fertilizer ADA
+  await prisma.brand.create({
+    data: {
+      name: 'ADA',
+      website: 'https://www.adana.co.jp',
+      logo: 'brand/LogoADA.jpg',
+      Fertilizer: {
+        createMany: {
+          data: fertilizerAda
+        }
+      }
+    }
+  })
+  // Fertilizer Seachem
+  await prisma.brand.create({
+    data: {
+      name: 'Seachem',
+      website: 'https://www.seachem.com',
+      logo: 'brand/LogoSeachem.jpg',
+      Fertilizer: {
+        createMany: {
+          data: fertilizerSeachem
+        }
+      }
+    }
+  })
+  // Fertilizer co-op
+  await prisma.brand.create({
+    data: {
+      name: 'Aquarium Co-op',
+      website: 'https://www.aquariumcoop.com',
+      logo: 'brand/LogoCoOp.jpg',
+      Fertilizer: {
+        create: {
+          name: 'Easy Green All-in-One Fertilizer',
+          description:
+            'Contains All Essential Nutrients Plants Need Easy Dosing, 1 Pump Per 10 Gallons Fish, Shrimp, and Snail Safe',
+          unit: 'ml/day',
+          avatar: 'fertilizer/EasyGreenAllInOne.jpg'
+        }
+      }
+    }
+  })
+  // Fertilizer nilocg
+  await prisma.brand.create({
+    data: {
+      name: 'NilocG',
+      website: 'https://www.nilocg.com',
+      logo: 'brand/nilocg.jpg',
+      Fertilizer: {
+        createMany: {
+          data: fertilizerNilocG
+        }
+      }
+    }
+  })
+  // Fertilizer GreenAqua
+  await prisma.brand.create({
+    data: {
+      name: 'Green Aqua',
+      website: 'https://greenaqua.hu',
+      logo: 'brand/LogoGreenAqua.jpg',
+      Fertilizer: {
+        createMany: {
+          data: fertilizerGreenAqua
+        }
+      }
+    }
+  })
+  // Fertilizer Custom
+  await prisma.brand.create({
+    data: {
+      name: 'No Brand',
+      website: '',
+      logo: '',
+      Fertilizer: {
+        createMany: {
+          data: fertilizerCustom
+        }
+      }
+    }
+  })
+  // Fertilizer Dennerle
+  await prisma.brand.create({
+    data: {
+      name: 'Dennerle',
+      website: 'https://dennerle.com',
+      logo: 'brand/dennerleLogo.jpg',
+      Fertilizer: {
+        createMany: {
+          data: fertilizerDennerle
+        }
+      }
     }
   })
 
   await prisma.plant.createMany({
     data: plants
-  })
-  await prisma.fertilizer.create({
-    data: {
-      name: 'Specialised Nutrition',
-      description:
-        'Contains nitrogen and phosphor for fast-growing and demanding plants, also contains iron, magnesium and vital micro nutrients. Suitable for aquariums with many and fast-growing plants',
-      unit: 'ml/day',
-      avatar: 'fertilizer/tropicaSpecializedNutrition.jpg',
-      brandId: TropicaBrand.id
-    }
-  })
-  await prisma.fertilizer.create({
-    data: {
-      name: 'Premium Nutrition',
-      description:
-        'Contains iron, magnesium and vital micro nutrients, does not contain nitrogen and phosphor. Suitable for aquariums with few or slow-growing plants and many fish',
-      unit: 'ml/day',
-      avatar: 'fertilizer/tropicaPremiumNutrition.jpg',
-      brandId: TropicaBrand.id
-    }
   })
 }
 

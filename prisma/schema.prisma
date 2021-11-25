@@ -158,7 +158,7 @@ model Tank {
 model TankFertilizer {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-  amount       Int        @default(0)
+  amount       Float      @default(0)
   // Relation & index --------------
   Tank         Tank       @relation(fields: [tankId], references: [id], onDelete: Cascade)
   tankId       Int

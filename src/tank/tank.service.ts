@@ -204,18 +204,6 @@ export class TankService {
         throw new ForbiddenException()
       }
 
-      await this.prismaService.tankFertilizer.deleteMany({
-        where: {
-          tankId: id
-        }
-      })
-
-      await this.prismaService.tankPlant.deleteMany({
-        where: {
-          tankId: id
-        }
-      })
-
       const result = await this.prismaService.tank.update({
         where: {
           id
@@ -223,11 +211,17 @@ export class TankService {
         data: {
           ...restTank,
           TankPlant: {
+            deleteMany: {
+              tankId: id
+            },
             createMany: {
               data: plants ? [...plants] : []
             }
           },
           TankFertilizer: {
+            deleteMany: {
+              tankId: id
+            },
             createMany: {
               data: ferts ? [...ferts] : []
             }

@@ -222,15 +222,13 @@ export class UserService {
           data: {
             email,
             password: createHash(password),
-            profileId: (
-              await this.prismaService.profile.create({
-                data: {
-                  username: `${email.split('@')[0]}_${crypto
-                    .randomBytes(3)
-                    .toString('hex')}`
-                }
-              })
-            ).id
+            Profile: {
+              create: {
+                username: `${email.split('@')[0]}_${crypto
+                  .randomBytes(3)
+                  .toString('hex')}`
+              }
+            }
           }
         })
 

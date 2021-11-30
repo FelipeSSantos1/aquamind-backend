@@ -47,7 +47,7 @@ export class NotificationService {
         message
       ])
 
-      return await this.prismaService.message.create({
+      return await this.prismaService.notification.create({
         data: {
           title,
           message: body,
@@ -62,6 +62,7 @@ export class NotificationService {
         }
       })
     } catch (error) {
+      console.log({ error })
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaError.ForeignKeyConstraint) {
           throw new NotFoundException('ForeignKeyConstraint')
@@ -74,5 +75,29 @@ export class NotificationService {
       }
       throw new InternalServerErrorException('Something went wrong')
     }
+  }
+
+  getAllByUser(user: User) {
+    return this.prismaService.notification.findMany({
+      where: {
+        toProfileId: user.profileId
+      },
+      select: {
+        id: true,
+        fromProfileId: true,
+        toProfileId: true,
+        message: true,
+        createdAt: true,
+        title: true,
+        read: true,
+        commentId: true,
+        postId: true
+      },
+      orderBy: [
+        {
+          createdAt: 'desc'
+        }
+      ]
+    })
   }
 }

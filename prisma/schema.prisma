@@ -54,25 +54,25 @@ enum TokenType {
 }
 
 model Profile {
-  id          Int           @id @default(autoincrement())
-  name        String?
-  username    String?       @unique
-  country     String?
-  bio         String?
-  avatar      String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id               Int            @id @default(autoincrement())
+  name             String?
+  username         String?        @unique
+  country          String?
+  bio              String?
+  avatar           String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
   // Relation & index --------------
-  Following   Follower[]    @relation("Following")
-  Followers   Follower[]    @relation("Follower")
-  User        User?
-  Tanks       Tank[]
-  LikePost    LikePost[]
-  Comment     Comment[]
-  LikeComment LikeComment[]
-  Posts       Post[]
-  MessageTo   Message[]     @relation("ToProfile")
-  MessageFrom Message[]     @relation("FromProfile")
+  Following        Follower[]     @relation("Following")
+  Followers        Follower[]     @relation("Follower")
+  User             User?
+  Tanks            Tank[]
+  LikePost         LikePost[]
+  Comment          Comment[]
+  LikeComment      LikeComment[]
+  Posts            Post[]
+  NotificationTo   Notification[] @relation("ToProfile")
+  NotificationFrom Notification[] @relation("FromProfile")
 }
 
 model Brand {
@@ -181,19 +181,19 @@ model TankPlant {
 }
 
 model Post {
-  id          Int        @id @default(autoincrement())
-  description String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id           Int            @id @default(autoincrement())
+  description  String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   // Relation & index --------------
-  LikePost    LikePost[]
-  Comment     Comment[]
-  Photos      File[]
-  Tank        Tank?      @relation(fields: [tankId], references: [id], onDelete: Cascade)
-  tankId      Int?
-  Profile     Profile?   @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  profileId   Int?
-  Message     Message[]
+  LikePost     LikePost[]
+  Comment      Comment[]
+  Photos       File[]
+  Tank         Tank?          @relation(fields: [tankId], references: [id], onDelete: Cascade)
+  tankId       Int?
+  Profile      Profile?       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId    Int?
+  Notification Notification[]
 }
 
 model LikePost {
@@ -209,20 +209,20 @@ model LikePost {
 }
 
 model Comment {
-  id          Int           @id @default(autoincrement())
-  comment     String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id           Int            @id @default(autoincrement())
+  comment      String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   // Relation & index --------------
-  Parent      Comment?      @relation("CommentToComment", fields: [parentId], references: [id], onDelete: Cascade)
-  parentId    Int?
-  Comment     Comment[]     @relation("CommentToComment")
-  Post        Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId      Int
-  Profile     Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  profileId   Int
-  LikeComment LikeComment[]
-  Message     Message[]
+  Parent       Comment?       @relation("CommentToComment", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId     Int?
+  Comment      Comment[]      @relation("CommentToComment")
+  Post         Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId       Int
+  Profile      Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId    Int
+  LikeComment  LikeComment[]
+  Notification Notification[]
 }
 
 model LikeComment {
@@ -259,7 +259,7 @@ enum FileType {
   PHOTO
 }
 
-model Message {
+model Notification {
   id            Int      @id @default(autoincrement())
   expoId        String?
   title         String?

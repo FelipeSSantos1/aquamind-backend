@@ -62,7 +62,6 @@ export class NotificationService {
         }
       })
     } catch (error) {
-      console.log({ error })
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaError.ForeignKeyConstraint) {
           throw new NotFoundException('ForeignKeyConstraint')

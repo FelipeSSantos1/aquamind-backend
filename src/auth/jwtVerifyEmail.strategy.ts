@@ -1,6 +1,10 @@
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common'
 import { Request } from 'express'
 import { ConfigService } from '@nestjs/config'
 
@@ -36,7 +40,9 @@ export class JwtVerifyEmailStrategy extends PassportStrategy(
 
       return user
     } catch (error) {
-      console.log(error)
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('User not found')
+      }
       throw new ForbiddenException()
     }
   }

@@ -107,10 +107,16 @@ export class UserService {
         }
       })
 
+      if (!result) {
+        throw new NotFoundException()
+      }
       result.password = undefined
       result.pnToken = undefined
       return result
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('User not found')
+      }
       throw new BadRequestException()
     }
   }

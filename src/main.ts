@@ -22,8 +22,16 @@ async function bootstrap() {
   )
   app.use(express.json({ limit: '50mb' }))
   app.enableCors({
-    origin: ['http://aquamind.app', 'https://aquamind.app'],
-    methods: ['PATCH', 'POST']
+    origin: [
+      'http://aquamind.app',
+      'http://www.aquamind.app',
+      'https://aquamind.app',
+      'https://www.aquamind.app',
+      'http://localhost:3000',
+      'http://localhost:3001'
+    ],
+    methods: ['PATCH', 'POST'],
+    allowedHeaders: 'Content-Type, Authorization'
   })
   app.useGlobalPipes(new ValidationPipe())
   await app.listen(3000)

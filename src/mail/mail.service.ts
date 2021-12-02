@@ -66,7 +66,7 @@ export class MailService {
     ...params
   }: forgotPasswordProps & ForgotPasswordDto) {
     const config = new ConfigService()
-    const url = `${config.get('RESET_PASSWORD_ENDPOINT')}/${token}`
+    const url = `${config.get('RESET_PASSWORD_ENDPOINT')}?token=${token}`
     return await this.sendMail({
       to: email,
       subject: 'Reset your password',

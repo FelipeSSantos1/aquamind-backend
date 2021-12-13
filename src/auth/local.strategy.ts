@@ -16,9 +16,14 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     try {
       const user = await this.authService.getAuthenticatedUser(email, password)
 
-      if (!user.active) throw new ForbiddenException('Account not active')
+      if (!user.active)
+        throw new ForbiddenException(
+          'Account not active. If you have not received an email, please ask for a new one at create account screen'
+        )
       if (!user.emailVerified)
-        throw new ForbiddenException('Email not verified')
+        throw new ForbiddenException(
+          'Email not verified. If you have not received an email, please ask for a new one at create account screen'
+        )
 
       return user
     } catch (error) {

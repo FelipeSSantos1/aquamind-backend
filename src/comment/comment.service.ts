@@ -9,22 +9,60 @@ import {
 import { Prisma, User, Role } from '@prisma/client'
 import _ from 'lodash'
 
+import { NotificationService } from 'src/notification/notification.service'
 import { PrismaService } from 'src/prisma.service'
 import { PrismaError } from 'src/utils/prismaError'
 import { CreateCommentDto } from './dto/comment.dto'
 
 @Injectable()
 export class CommentService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly notificationService: NotificationService
+  ) {}
 
-  async create(createCommentDto: CreateCommentDto, profileId: number) {
+  async create(createCommentDto: CreateCommentDto, user: User) {
     try {
-      return await this.prismaService.comment.create({
+      const createdComment = await this.prismaService.comment.create({
         data: {
-          profileId,
+          profileId: user.profileId,
           ...createCommentDto
+        },
+        include: {
+          Profile: true
         }
       })
+
+      const postOwner = await this.prismaService.post.findFirst({
+        where: {
+          id: createCommentDto.postId
+        },
+        include: {
+          Profile: {
+            include: {
+              User: true
+            }
+          }
+        }
+      })
+
+      if (postOwner.Profile.User) {
+        this.notificationService.sendNotification(
+          {
+            to: postOwner.Profile.id,
+            title: 'New comment',
+            body: `${createdComment.Profile.username} commented on your post`,
+            postId: createCommentDto.postId,
+            commentId: createdComment.id,
+            data: {
+              url: `aquamindapp://likePostComment/${createCommentDto.postId}/${createdComment.id}`
+            }
+          },
+          user
+        )
+      }
+
+      return createdComment
     } catch (error) {
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')
@@ -165,12 +203,46 @@ export class CommentService {
 
   async likeComment(user: User, commentId: number) {
     try {
-      return await this.prismaService.likeComment.create({
+      const likedComment = await this.prismaService.likeComment.create({
         data: {
           profileId: user.profileId,
           commentId
+        },
+        include: {
+          Profile: true
         }
       })
+
+      const commentOwner = await this.prismaService.comment.findFirst({
+        where: {
+          id: commentId
+        },
+        include: {
+          Profile: {
+            include: {
+              User: true
+            }
+          }
+        }
+      })
+
+      if (commentOwner) {
+        this.notificationService.sendNotification(
+          {
+            to: commentOwner.profileId,
+            title: 'Someone liked your comment',
+            body: `${likedComment.Profile.username} liked your comment`,
+            postId: commentOwner.postId,
+            commentId: commentId,
+            data: {
+              url: `aquamindapp://likePostComment/${commentOwner.postId}/${commentId}`
+            }
+          },
+          commentOwner.Profile.User
+        )
+      }
+
+      return likedComment
     } catch (error) {
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new BadRequestException('Some of your input has a wrong value')

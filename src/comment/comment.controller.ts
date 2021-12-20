@@ -23,7 +23,7 @@ export class CommentController {
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@Body() createCommentDto: CreateCommentDto, @Req() req: ReqWithUser) {
-    return this.commentService.create(createCommentDto, req.user.profileId)
+    return this.commentService.create(createCommentDto, req.user)
   }
 
   @Get(':id')

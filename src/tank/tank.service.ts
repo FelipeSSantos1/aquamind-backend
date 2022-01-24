@@ -82,7 +82,7 @@ export class TankService {
 
   async findAllByUser(user: User) {
     try {
-      const result = this.prismaService.tank.findMany({
+      const result = await this.prismaService.tank.findMany({
         where: {
           profileId: user.profileId
         },
@@ -120,12 +120,36 @@ export class TankService {
                 name: 'asc'
               }
             }
+          },
+          Posts: {
+            select: {
+              Photos: {
+                select: {
+                  url: true,
+                  height: true,
+                  width: true,
+                  id: true
+                }
+              }
+            }
           }
         },
         orderBy: {
           born: 'desc'
         }
       })
+      for (const tank of result) {
+        const mergedPhotos: {
+          id: number
+          width: number
+          height: number
+          url: string
+        }[] = []
+        for (const posts of tank.Posts) {
+          mergedPhotos.push(...posts.Photos)
+        }
+        tank.Posts = [{ Photos: mergedPhotos }]
+      }
 
       return result
     } catch (error) {
@@ -173,12 +197,34 @@ export class TankService {
                 name: 'asc'
               }
             }
+          },
+          Posts: {
+            select: {
+              Photos: {
+                select: {
+                  url: true,
+                  height: true,
+                  width: true,
+                  id: true
+                }
+              }
+            }
           }
         }
       })
       if (!result) {
         throw new NotFoundException()
       }
+      const mergedPhotos: {
+        id: number
+        width: number
+        height: number
+        url: string
+      }[] = []
+      for (const posts of result.Posts) {
+        mergedPhotos.push(...posts.Photos)
+      }
+      result.Posts = [{ Photos: mergedPhotos }]
 
       return result
     } catch (error) {

@@ -1,4 +1,5 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common'
+import { Throttle } from '@nestjs/throttler'
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard'
 import { GetByNameDto, PlantIdDto } from './dto/plant.dto'
 import { PlantService } from './plant.service'
@@ -14,6 +15,7 @@ export class PlantController {
   }
 
   @Get(':id')
+  @Throttle(30, 60)
   @UseGuards(JwtAuthGuard)
   getById(@Param() { id }: PlantIdDto) {
     return this.plantService.getById({ id })

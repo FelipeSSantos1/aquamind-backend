@@ -129,6 +129,19 @@ model Plant {
   TankPlant      TankPlant[]
 }
 
+model Algae {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  cause       String?
+  treatment   String?
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Relation & index --------------
+  Photos      File[]
+}
+
 model Tank {
   id             Int              @id @default(autoincrement())
   name           String
@@ -253,6 +266,8 @@ model File {
   plantId      Int?
   Fertilizer   Fertilizer? @relation(fields: [fertilizerId], references: [id], onDelete: Cascade)
   fertilizerId Int?
+  Algae        Algae?      @relation(fields: [algaeId], references: [id])
+  algaeId      Int?
 }
 
 enum FileType {

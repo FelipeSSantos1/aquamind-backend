@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client'
-import plants from './plantSeed'
-import fertilizerTropica from './fertilizer/tropica'
-import fertilizerAda from './fertilizer/ada'
-import fertilizerSeachem from './fertilizer/seachem'
-import fertilizerNilocG from './fertilizer/nilocG'
-import fertilizerGreenAqua from './fertilizer/greenAqua'
-import fertilizerCustom from './fertilizer/custom'
-import fertilizerDennerle from './fertilizer/dennerle'
+import plants from './seedSource/plantSeed'
+import fertilizerTropica from './seedSource/fertilizer/tropica'
+import fertilizerAda from './seedSource/fertilizer/ada'
+import fertilizerSeachem from './seedSource/fertilizer/seachem'
+import fertilizerNilocG from './seedSource/fertilizer/nilocG'
+import fertilizerGreenAqua from './seedSource/fertilizer/greenAqua'
+import fertilizerCustom from './seedSource/fertilizer/custom'
+import fertilizerDennerle from './seedSource/fertilizer/dennerle'
 const prisma = new PrismaClient()
 
 async function main() {

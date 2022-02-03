@@ -7,6 +7,7 @@ import { MailModule } from './mail/mail.module'
 import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
 import { PlantModule } from './plant/plant.module'
+import { AlgaeModule } from './algae/algae.module'
 import { FertilizerModule } from './fertilizer/fertilizer.module'
 import { PostModule } from './post/post.module'
 import { TankModule } from './tank/tank.module'
@@ -48,6 +49,7 @@ import { APP_GUARD } from '@nestjs/core'
     AuthModule,
     UserModule,
     PlantModule,
+    AlgaeModule,
     FertilizerModule,
     PostModule,
     TankModule,

@@ -32,6 +32,12 @@
 $ npm install
 ```
 
+## After manual Data Import
+reset incremental id
+```bash
+SELECT setval(pg_get_serial_sequence('"Algae"', 'id'), coalesce(max(id)+1, 1), false) FROM "Algae";
+```
+
 ## Running the app
 
 ```bash

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 
 import { PrismaService } from 'src/prisma.service'
 import { GetByNameDto, AlgaeIdDto } from './dto/algae.dto'
-
+//
 @Injectable()
 export class AlgaeService {
   constructor(private readonly prismaService: PrismaService) {}

@@ -92,6 +92,7 @@ export class NotificationService {
         commentId: true,
         postId: true
       },
+      take: 100,
       orderBy: [
         {
           createdAt: 'desc'

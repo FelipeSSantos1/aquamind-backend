@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
 import { PlantModule } from './plant/plant.module'
 import { AlgaeModule } from './algae/algae.module'
+import { StoneModule } from './stone/stone.module'
 import { FertilizerModule } from './fertilizer/fertilizer.module'
 import { PostModule } from './post/post.module'
 import { TankModule } from './tank/tank.module'
@@ -50,6 +51,7 @@ import { APP_GUARD } from '@nestjs/core'
     UserModule,
     PlantModule,
     AlgaeModule,
+    StoneModule,
     FertilizerModule,
     PostModule,
     TankModule,

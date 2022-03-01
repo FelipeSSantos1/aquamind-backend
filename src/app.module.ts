@@ -10,6 +10,7 @@ import { PlantModule } from './plant/plant.module'
 import { AlgaeModule } from './algae/algae.module'
 import { StoneModule } from './stone/stone.module'
 import { FishModule } from './fish/fish.module'
+import { WoodModule } from './wood/wood.module'
 import { FertilizerModule } from './fertilizer/fertilizer.module'
 import { PostModule } from './post/post.module'
 import { TankModule } from './tank/tank.module'
@@ -54,6 +55,7 @@ import { APP_GUARD } from '@nestjs/core'
     AlgaeModule,
     StoneModule,
     FishModule,
+    WoodModule,
     FertilizerModule,
     PostModule,
     TankModule,

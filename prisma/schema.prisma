@@ -154,6 +154,38 @@ model Stone {
   Photos         File[]
 }
 
+model Fish {
+  id             Int      @id @default(autoincrement())
+  scientificName String?  @unique
+  commonName     String?  @unique
+  description    String?
+  behaviour      String?
+  diet           String?
+  ph             String?
+  temperature    String?
+  tankSize       String?
+  size           String?
+  origin         String?
+  thumb          String?
+  source         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  // Relation & index --------------
+  Photos         File[]
+}
+
+model Wood {
+  id          Int      @id @default(autoincrement())
+  name        String?  @unique
+  description String?
+  thumb       String?
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Relation & index --------------
+  Photos      File[]
+}
+
 model Tank {
   id             Int              @id @default(autoincrement())
   name           String
@@ -278,10 +310,14 @@ model File {
   plantId      Int?
   Fertilizer   Fertilizer? @relation(fields: [fertilizerId], references: [id], onDelete: Cascade)
   fertilizerId Int?
-  Algae        Algae?      @relation(fields: [algaeId], references: [id])
+  Algae        Algae?      @relation(fields: [algaeId], references: [id], onDelete: Cascade)
   algaeId      Int?
-  Stone        Stone?      @relation(fields: [stoneId], references: [id])
+  Stone        Stone?      @relation(fields: [stoneId], references: [id], onDelete: Cascade)
   stoneId      Int?
+  Fish         Fish?       @relation(fields: [fishId], references: [id], onDelete: Cascade)
+  fishId       Int?
+  Wood         Wood?       @relation(fields: [woodId], references: [id])
+  woodId       Int?
 }
 
 enum FileType {

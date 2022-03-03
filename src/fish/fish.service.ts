@@ -18,7 +18,7 @@ export class FishService {
       },
       orderBy: [
         {
-          scientificName: 'asc'
+          commonName: 'asc'
         }
       ]
     })
@@ -64,7 +64,7 @@ export class FishService {
       },
       orderBy: [
         {
-          scientificName: 'asc'
+          commonName: 'asc'
         }
       ]
     })
